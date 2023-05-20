@@ -1,0 +1,87 @@
+﻿<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta http-equiv="Content-Language" content="en">
+		<meta charset="UTF-8">
+		<meta name="google" content="notranslate">
+		
+		<link rel="manifest" href="manifest.webmanifest">
+
+
+		<script type="text/javascript" src="tools/svg-loader/svg-loader.js"></script>
+		<script type="text/javascript" src="tools/downloader/downloader.js"></script>
+
+		<link rel="stylesheet" href="tools/elements/elements.css">
+
+		<script type="text/javascript" src="tools/elements/bottom-menu/bottom-menu.js"></script>
+		<link rel="stylesheet" href="tools/elements/bottom-menu/bottom-menu.css">
+
+		<script type="text/javascript" src="tools/elements/vertical-list/vertical-list.js"></script>
+		<link rel="stylesheet" href="tools/elements/vertical-list/vertical-list.css">
+		
+		<script type="text/javascript" src="tools/elements/horizontal-scroll/horizontal-scroll.js"></script>
+		<link rel="stylesheet" href="tools/elements/horizontal-scroll/horizontal-scroll.css">
+
+		<script type="text/javascript" src="tools/elements/app-element/app-element.js"></script>
+		<link rel="stylesheet" href="tools/elements/app-element/app-element.css">
+
+		<script type="text/javascript" src="tools/elements/horizontal-titled-scroll/horizontal-titled-scroll.js"></script>
+		<link rel="stylesheet" href="tools/elements/horizontal-titled-scroll/horizontal-titled-scroll.css">
+
+		<script type="text/javascript" src="tools/elements/titled-image/titled-image.js"></script>
+		<link rel="stylesheet" href="tools/elements/titled-image/titled-image.css">
+
+		<style>	
+			* {
+				margin: 0px;
+				padding: 0px;
+				font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+			}
+
+			body {
+				width: 100%;
+				height: 100%;
+				/*
+				background: url("IMG_0367.png");
+				background-size: contain;*/
+			}
+
+			#page {
+				height: 100%;
+				overflow: auto;
+				scroll-snap-type: y proximity;
+			}
+			#page:after {
+				content: "";
+				height: 37pt;
+				display: block;
+			}
+
+			.blurred {
+				backdrop-filter: blur(33px);
+				background-blend-mode: overlay;
+			}
+			
+		</style>
+		<script>
+			function menuSelected(menu){
+				loadContent(`tools/layouts/${menu.layout.type}.html`, layout => {
+					var pageElement = document.querySelector("#page");
+
+					pageElement.innerHTML = layout
+						.replaceAll("${title}", menu.layout.title);
+					executeScriptsInElement(pageElement);
+
+					loadContent(menu.layout.content, content => {
+						var contentElement = document.querySelector("#page #content");
+						contentElement.innerHTML = content;
+					});
+				});
+			}
+		</script>
+	</head>
+	<body>
+		<div id="page"></div>
+		<bottom-menu id="menu" src="content.json" onMenuSelect="menuSelected" class="blurred"></bottom-menu>
+	</body>
+</html>
