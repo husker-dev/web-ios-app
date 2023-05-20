@@ -1,0 +1,64 @@
+﻿<style>
+	#page > #flying-header {
+		position: fixed;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 33pt;
+		padding-top: 15pt;
+		
+		background: rgba(255, 255, 255, 0.9);
+		box-shadow: 0px 1px 0px 0px rgba(0, 0, 0, 0.2);
+
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+
+		font-weight: bold;
+		color: transparent;
+		transition: color 0.15s ease;
+		z-index: 2;
+	}
+
+	#page > #header {
+		padding: 50pt 12pt 8pt 12pt;
+		font-size: 22pt;
+		font-weight: bold;
+		scroll-snap-align: end;
+		scroll-margin-top: 35pt;
+	}
+	#page > #content {
+		scroll-snap-align: start;
+		scroll-margin-top: 48pt;
+	}
+	
+</style>
+
+<script>
+	var page = document.querySelector("#page");
+	var flying_header = document.querySelector("#flying-header");
+	var minY = 30;
+
+	page.addEventListener("scroll", (e) => updateScroll());
+	updateScroll();
+	
+	function updateScroll(){
+		var scroll = page.scrollTop;
+		if(scroll > minY)
+			flying_header.style.color = "black";
+		else
+			flying_header.style.color = "transparent";
+		flying_header.style.boxShadow = `0px 1px 0px 0px rgba(0, 0, 0, ${Math.min(Math.max(scroll / minY * 0.2, 0), 0.2)})`;
+	}
+</script>
+
+<div id="flying-header" class="blurred">
+	<div>${title}</div>
+</div>
+
+<div id="header">
+	${title}
+</div>
+
+<div id="content"></div>
