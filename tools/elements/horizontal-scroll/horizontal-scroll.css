@@ -6,6 +6,7 @@ horizontal-scroll {
 
 	scroll-snap-type: x mandatory;
 	scroll-snap-stop: always;
+	scroll-padding-left: 12pt;
 	scrollbar-width: none;
 }
 
@@ -20,7 +21,6 @@ horizontal-scroll > * {
 	margin-left: 6pt;
 
 	scroll-snap-align: start;
-	scroll-margin-left: 12pt;
 }
 
 horizontal-scroll > *:first-child {

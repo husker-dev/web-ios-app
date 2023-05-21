@@ -22,6 +22,7 @@
 		display: table-cell;
 		text-align: center;
 		line-height: 44px;
+		font-size: 12pt;
 
 		transition: color 0.15s ease;
 	}
@@ -47,6 +48,10 @@
 	var minY = 30;
 
 	page.addEventListener("scroll", (e) => updateScroll());
+	window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+		updateScroll();
+		flying_header.style.transition = "";
+	});
 	updateScroll();
 	
 	function updateScroll(){
@@ -62,6 +67,7 @@
 		
 		flying_header.style.background = new_background.toCSS();
 		flying_header.style.boxShadow = `0px 1px 0px 0px ${new_border_color.toCSS()}`;
+		flying_header.style.transition = "none";
 
 		title.style.color = delta == 1 ? "var(--color-text)" : "transparent";
 	}

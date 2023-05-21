@@ -1,6 +1,6 @@
 ﻿<html>
 	<head>
-		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 		<meta http-equiv="Content-Language" content="en">
 		<meta charset="UTF-8">
 		<meta name="google" content="notranslate">
@@ -45,6 +45,7 @@
 				width: 100%;
 				height: 100%;
 				background-color: var(--color-background);
+				overflow: hidden;
 				/*
 				background: url("IMG_0367.png");
 				background-size: contain;*/
@@ -56,7 +57,7 @@
 			#page {
 				height: 100%;
 				overflow: auto;
-				scroll-snap-type: y proximity;
+				/*scroll-snap-type: y proximity;*/
 			}
 			#page:after {
 				content: "";

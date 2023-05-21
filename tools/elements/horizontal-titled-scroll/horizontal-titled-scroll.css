@@ -50,6 +50,7 @@ horizontal-titled-scroll #blocks {
 
 	scroll-snap-type: x mandatory;
 	scroll-snap-stop: always;
+	scroll-padding-left: 12pt;
 	scrollbar-width: none;
 }
 
@@ -62,7 +63,6 @@ horizontal-titled-scroll #blocks > * {
 	margin-left: 6pt;
 
 	scroll-snap-align: start;
-	scroll-margin-left: 12pt;
 }
 
 horizontal-titled-scroll #blocks > *:first-child {
