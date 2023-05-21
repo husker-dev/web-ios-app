@@ -27,7 +27,7 @@ html {
 
 	html {
 		--color-background: rgba(0, 0, 0, 1);
-		--color-background-blurred: rgba(55, 55, 55, 0.75);
+		--color-background-blurred: rgba(10, 10, 10, 0.75);
 
 		--color-accent: rgba(10, 132, 255);
 		--color-accent-inactive: rgba(127, 127, 127);
