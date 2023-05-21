@@ -62,6 +62,7 @@
 		
 		flying_header.style.background = new_background.toCSS();
 		flying_header.style.boxShadow = `0px 1px 0px 0px ${new_border_color.toCSS()}`;
+		flying_header.style.transition = (delta > 0 && delta < 1) ? "none" : "";
 
 		title.style.color = delta == 1 ? "var(--color-text)" : "transparent";
 	}
