@@ -1,0 +1,78 @@
+﻿<style>
+	#page > #flying-header {
+		position: fixed;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 33pt;
+		padding-top: 15pt;
+		
+		box-shadow: 0px 1px 0px 0px rgba(0, 0, 0, 0.2);
+
+		display: flex;
+
+		font-weight: bold;
+		color: transparent;
+		
+		z-index: 2;
+	}
+
+	#page > #flying-header > #title {
+		flex: 1;
+		display: table-cell;
+		text-align: center;
+		line-height: 44px;
+
+		transition: color 0.15s ease;
+	}
+
+	#page > #header {
+		padding: 50pt 12pt 8pt 12pt;
+		font-size: 22pt;
+		font-weight: bold;
+		scroll-snap-align: end;
+		scroll-margin-top: 35pt;
+	}
+	#page > #content {
+		scroll-snap-align: start;
+		scroll-margin-top: calc(48pt - 1px);
+	}
+	
+</style>
+
+<script>
+	var page = document.querySelector("#page");
+	var flying_header = document.querySelector("#flying-header");
+	var title = document.querySelector("#flying-header #title");
+	var minY = 30;
+
+	page.addEventListener("scroll", (e) => updateScroll());
+	updateScroll();
+	
+	function updateScroll(){
+		var scroll = page.scrollTop;
+		var delta = Math.min(Math.max(scroll / minY, 0), 1);
+		
+		var border_color = colorFromString(getComputedStyle(document.documentElement).getPropertyValue("--color-border-dark"));
+		var new_border_color = border_color.alpha(delta);
+
+		var background = colorFromString(getComputedStyle(document.documentElement).getPropertyValue("--color-background"));
+		var background_blurred = colorFromString(getComputedStyle(document.documentElement).getPropertyValue("--color-background-blurred"));
+		var new_background = background.mix(background_blurred, delta);
+		
+		flying_header.style.background = new_background.toCSS();
+		flying_header.style.boxShadow = `0px 1px 0px 0px ${new_border_color.toCSS()}`;
+
+		title.style.color = delta == 1 ? "var(--color-text)" : "transparent";
+	}
+</script>
+
+<div id="flying-header" class="blurred">
+	<div id="title">${title}</div>
+</div>
+
+<div id="header">
+	${title}
+</div>
+
+<div id="content"></div>

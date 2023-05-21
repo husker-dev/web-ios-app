@@ -1,0 +1,39 @@
+horizontal-scroll {
+	display: flex;
+	width: 100%;
+	overflow: scroll;
+	padding-bottom: 23pt;
+
+	scroll-snap-type: x mandatory;
+	scroll-snap-stop: always;
+	scrollbar-width: none;
+}
+
+horizontal-scroll::-webkit-scrollbar {
+	display: none;
+}
+
+horizontal-scroll > * {
+	min-width: calc(100% - 24pt);
+	max-width: 300pt;
+	border-top: solid var(--color-border) 1px;
+	margin-left: 6pt;
+
+	scroll-snap-align: start;
+	scroll-margin-left: 12pt;
+}
+
+horizontal-scroll > *:first-child {
+	margin-left: 12pt;
+}
+
+horizontal-scroll > *:last-child {
+	margin-right: 12pt;
+}
+
+
+@media (min-width: 600px) {
+	horizontal-scroll > * {
+		min-width: 300pt;
+	}
+}
