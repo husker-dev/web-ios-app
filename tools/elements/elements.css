@@ -18,6 +18,7 @@ html {
 
 .blurred {
 	backdrop-filter: blur(33px);
+	-webkit-backdrop-filter: blur(33px);
 	background-blend-mode: overlay;
 	background: var(--color-background-blurred);
 }
