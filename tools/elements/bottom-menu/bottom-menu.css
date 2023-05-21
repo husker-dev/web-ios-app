@@ -19,7 +19,7 @@ bottom-menu > .button {
 
 	display: flex;
 	flex-direction: column;
-	justify-content: end;
+	justify-content: flex-end;
 	align-items: center;
 	
 	-webkit-touch-callout: none; /* iOS Safari */

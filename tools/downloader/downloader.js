@@ -10,9 +10,11 @@ function loadContent(src, callback){
 }
 
 function executeScriptsInElement(element){
-	var codes = element.getElementsByTagName("script");
-	console.log(codes);
-	console.log(element);
-	for(var i=0; i < codes.length;i++)
-		eval(codes[i].text);
+	Array.from(element.querySelectorAll("script"))
+		.forEach( oldScriptEl => {
+			const newScriptEl = document.createElement("script");
+			
+			newScriptEl.appendChild(document.createTextNode(oldScriptEl.innerHTML));
+			oldScriptEl.parentNode.replaceChild(newScriptEl, oldScriptEl);
+		});
 }
