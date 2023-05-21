@@ -51,6 +51,7 @@ horizontal-titled-scroll #blocks {
 	scroll-snap-type: x mandatory;
 	scroll-snap-stop: always;
 	scroll-padding-left: 12pt;
+	scroll-padding-right: 12pt;
 	scrollbar-width: none;
 }
 
