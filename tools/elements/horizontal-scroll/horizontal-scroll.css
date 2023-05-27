@@ -29,7 +29,7 @@ horizontal-scroll > *:first-child {
 }
 
 horizontal-scroll > *:last-child {
-	margin-right: 12pt;
+	padding-right: 12pt;
 }
 
 
