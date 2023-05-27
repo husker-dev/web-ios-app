@@ -29,7 +29,7 @@ horizontal-scroll > *:first-child {
 }
 
 horizontal-scroll > *:last-child {
-	padding-right: 12pt;
+	border-right: solid 12pt transparent;
 }
 
 
