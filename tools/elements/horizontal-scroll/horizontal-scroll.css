@@ -2,13 +2,16 @@ horizontal-scroll {
 	display: flex;
 	width: 100%;
 	overflow: scroll;
-	padding-bottom: 23pt;
 
 	scroll-snap-type: x mandatory;
 	scroll-snap-stop: always;
 	scroll-padding-left: 12pt;
 	scroll-padding-right: 12pt;
 	scrollbar-width: none;
+	
+	gap: 6pt;
+	box-sizing: border-box;
+	padding: 0 12pt 23pt 12pt;
 }
 
 horizontal-scroll::-webkit-scrollbar {
@@ -16,22 +19,13 @@ horizontal-scroll::-webkit-scrollbar {
 }
 
 horizontal-scroll > * {
-	min-width: calc(100% - 24pt);
+	min-width: 100%;
 	max-width: 300pt;
 	border-top: solid var(--color-border) 1px;
 	margin-left: 6pt;
 
 	scroll-snap-align: start;
 }
-
-horizontal-scroll > *:first-child {
-	margin-left: 12pt;
-}
-
-horizontal-scroll > *:last-child {
-	border-right: solid 12pt transparent;
-}
-
 
 @media (min-width: 600px) {
 	horizontal-scroll > * {
