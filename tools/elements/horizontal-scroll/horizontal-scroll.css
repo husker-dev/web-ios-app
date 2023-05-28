@@ -8,27 +8,35 @@ horizontal-scroll {
 	scroll-padding-left: 12pt;
 	scroll-padding-right: 12pt;
 	scrollbar-width: none;
-	
+
 	gap: 6pt;
 	box-sizing: border-box;
-	padding: 0 12pt 23pt 12pt;
+	padding-bottom: 23pt;
 }
 
 horizontal-scroll::-webkit-scrollbar {
 	display: none;
 }
 
-horizontal-scroll > * {
-	min-width: 100%;
+horizontal-scroll > .horizontal-scroll-element {
+	min-width: calc(100% - 24pt);
 	max-width: 300pt;
 	border-top: solid var(--color-border) 1px;
-	margin-left: 6pt;
-
+	
 	scroll-snap-align: start;
 }
 
+horizontal-scroll > .horizontal-scroll-element:first-child {
+	border-left: solid 12pt transparent;
+}
+
+horizontal-scroll > .horizontal-scroll-element:last-child {
+	border-right: solid 12pt transparent;
+}
+
+
 @media (min-width: 600px) {
-	horizontal-scroll > * {
+	horizontal-scroll > .horizontal-scroll-element {
 		min-width: 300pt;
 	}
 }
