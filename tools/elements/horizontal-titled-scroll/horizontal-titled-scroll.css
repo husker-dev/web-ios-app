@@ -1,7 +1,9 @@
 horizontal-titled-scroll {
+	width: calc(100% + 24pt);
 	display: flex;
 	flex-direction: column;
 	padding-bottom: 23pt;
+	margin-left: -12pt;
 }
 
 horizontal-titled-scroll > #head {
@@ -69,11 +71,11 @@ horizontal-titled-scroll #blocks > * + * {
 }
 
 horizontal-titled-scroll #blocks > *:first-child {
-	border-left: solid 12pt transparent;
+	padding-left: 12pt;
 }
 
 horizontal-titled-scroll #blocks > *:last-child {
-	border-right: solid 12pt transparent;
+	padding-right: 12pt;
 }
 
 
