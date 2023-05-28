@@ -6,11 +6,8 @@ horizontal-scroll {
 	scroll-snap-type: x mandatory;
 	scroll-snap-stop: always;
 	scroll-padding-left: 12pt;
-	scroll-padding-right: 12pt;
 	scrollbar-width: none;
 
-	gap: 6pt;
-	box-sizing: border-box;
 	padding-bottom: 23pt;
 }
 
@@ -18,20 +15,27 @@ horizontal-scroll::-webkit-scrollbar {
 	display: none;
 }
 
-horizontal-scroll > .horizontal-scroll-element {
+horizontal-scroll > horizontal-scroll-element {
+	display: grid;
 	min-width: calc(100% - 24pt);
 	max-width: 300pt;
-	border-top: solid var(--color-border) 1px;
-	
 	scroll-snap-align: start;
 }
 
-horizontal-scroll > .horizontal-scroll-element:first-child {
-	border-left: solid 12pt transparent;
+horizontal-scroll > horizontal-scroll-element > * {
+	border-top: solid var(--color-border) 1px;
 }
 
-horizontal-scroll > .horizontal-scroll-element:last-child {
-	border-right: solid 12pt transparent;
+horizontal-scroll > horizontal-scroll-element + horizontal-scroll-element {
+	margin-left: 6pt;
+}
+
+horizontal-scroll > horizontal-scroll-element:first-child {
+	padding-left: 12pt;
+}
+
+horizontal-scroll > horizontal-scroll-element:last-child {
+	padding-right: 12pt;
 }
 
 
