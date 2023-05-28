@@ -5,20 +5,13 @@
 			"icon": "resources/bars.svg",
 			"id": "main",
 			"text": "Главная",
-			"layout": {
-				"type": "titled-layout",
-				"title": "Главная",
-				"content": "pages/main.html"
-			}
+			"page": "pages/main"
 		},{
+			
 			"icon": "resources/search.svg",
 			"id": "search",
 			"text": "Поиск",
-			"layout": {
-				"type": "titled-layout",
-				"title": "Поиск",
-				"content": "pages/search.html"
-			}
+			"page": "pages/search"
 		}
 	]
 }

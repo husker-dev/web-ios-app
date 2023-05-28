@@ -34,6 +34,9 @@
 		<script type="text/javascript" src="tools/elements/titled-image/titled-image.js"></script>
 		<link rel="stylesheet" href="tools/elements/titled-image/titled-image.css">
 
+		<script type="text/javascript" src="tools/elements/search-box/search-box.js"></script>
+		<link rel="stylesheet" href="tools/elements/search-box/search-box.css">
+
 		<style>	
 			* {
 				margin: 0px;
@@ -47,47 +50,75 @@
 				background-color: var(--color-background);
 				overflow: hidden;
 				/*
-				background: url("IMG_0367.png");
-				background-size: contain;*/
+				background: url("IMG_0402.png");
+				background-size: contain;
+				*/
 
 				font-family: var(--ios-fonts);
 				color: var(--color-text);
 			}
 
-			#page {
-				height: 100vh;
+			.page {
+				height: 100%;
+				width: 100%;
 				overflow: auto;
-
-				/*scroll-snap-type: y proximity;*/
+				display: none;
 			}
-			#page:after {
+			.page.selected-page {
+				display: block;
+			}
+			.page:after {
 				content: "";
 				height: 37pt;
 				display: block;
 			}
-			#page::webkit-scrollbar-track {
-				margin-bottom: 37pt;
+			#page-content {
+				padding: 0 12pt 0 12pt;
 			}
 		</style>
 		<script>
 			function menuSelected(menu){
-				loadContent(`tools/layouts/${menu.layout.type}.html`, layout => {
-					var pageElement = document.querySelector("#page");
+				var pageElement = document.querySelector(`#page_${menu.page.replaceAll("/", "-")}`);
+				
+				if(pageElement === null){
+					// Load page manifest
+					loadContent(`${menu.page}.pagemanifest`, manifestText => {
+						const manifest = JSON.parse(manifestText);
+					
+						pageElement = document.createElement("div");
+						pageElement.id = `page_${menu.page.replaceAll("/", "-")}`;
+						pageElement.classList.add("page");
+						document.body.appendChild(pageElement);
+						selectPage(pageElement);
 
-					pageElement.innerHTML = layout
-						.replaceAll("${title}", menu.layout.title);
-					executeScriptsInElement(pageElement);
+						// Load layout
+						loadContent(manifest.layout, layoutText => {
+							pageElement.innerHTML = layoutText
+								.replaceAll("${page.title}", manifest.title);
+							executeScriptsInElement(pageElement);
 
-					loadContent(menu.layout.content, content => {
-						var contentElement = document.querySelector("#page #content");
-						contentElement.innerHTML = content;
+							// Load content
+							loadContent(`${menu.page}.html`, pageText => {
+								var contentElement = pageElement.querySelector("#page-content");
+								contentElement.innerHTML = pageText;
+
+								pageElement.onPageInit(pageElement);
+							});
+						});
 					});
-				});
+				} else selectPage(pageElement);
+			}
+
+			function selectPage(pageElement){
+				if(window.selectedPage !== undefined)
+					window.selectedPage.classList.remove("selected-page");
+				window.selectedPage = pageElement;
+				pageElement.classList.add("selected-page");
 			}
 		</script>
 	</head>
 	<body>
-		<div id="page"></div>
+		
 		<bottom-menu id="menu" src="content.json" onMenuSelect="menuSelected" class="blurred"></bottom-menu>
 	</body>
 </html>
