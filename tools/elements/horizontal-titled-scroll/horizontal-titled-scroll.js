@@ -17,4 +17,6 @@ class HorizontallTitledScroll extends HTMLElement {
 	}
 }
 
+class HorizontallTitledScrollElement extends HTMLElement {}
+
 window.customElements.define('horizontal-titled-scroll', HorizontallTitledScroll);

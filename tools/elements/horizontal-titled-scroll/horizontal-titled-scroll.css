@@ -61,17 +61,19 @@ horizontal-titled-scroll #blocks::-webkit-scrollbar {
 
 horizontal-titled-scroll #blocks > * {
 	min-width: calc(100% - 24pt);
-	margin-left: 6pt;
-
 	scroll-snap-align: start;
 }
 
+horizontal-titled-scroll #blocks > * + * {
+	margin-left: 6pt;
+}
+
 horizontal-titled-scroll #blocks > *:first-child {
-	margin-left: 12pt;
+	border-left: solid 12pt transparent;
 }
 
 horizontal-titled-scroll #blocks > *:last-child {
-	margin-right: 12pt;
+	border-right: solid 12pt transparent;
 }
 
 
