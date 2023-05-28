@@ -1,0 +1,5 @@
+﻿{
+	"id": "search",
+	"layout": "tools/layouts/titled-layout.html",
+	"title": "Поиск"
+}

@@ -1,0 +1,5 @@
+﻿{
+	"id": "main",
+	"layout": "tools/layouts/titled-layout.html",
+	"title": "Главная"
+}
