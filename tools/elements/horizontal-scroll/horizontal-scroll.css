@@ -1,6 +1,6 @@
 horizontal-scroll {
 	display: flex;
-	width: 100%;
+	width: calc(100% + 24pt);
 	overflow: scroll;
 
 	scroll-snap-type: x mandatory;
@@ -8,6 +8,7 @@ horizontal-scroll {
 	scroll-padding-left: 12pt;
 	scrollbar-width: none;
 
+	margin-left: -12pt;
 	padding-bottom: 23pt;
 }
 
