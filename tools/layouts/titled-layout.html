@@ -1,11 +1,9 @@
 ﻿<style>
-	#page > #flying-header {
-		position: fixed;
+	#flying-header {
+		position: sticky;
 		left: 0;
 		top: 0;
 		width: 100%;
-		
-		box-shadow: 0px 1px 0px 0px rgba(0, 0, 0, 0.2);
 
 		display: flex;
 		flex-direction: column;
@@ -16,12 +14,7 @@
 		z-index: 2;
 	}
 
-	#page > #flying-header > #status-bar {
-		height: 15pt;
-		background: var(--color-status-bar);
-	}
-
-	#page > #flying-header > #title {
+	#flying-header > #title {
 		flex: 1;
 		display: table-cell;
 		text-align: center;
@@ -31,59 +24,67 @@
 		transition: color 0.15s ease;
 	}
 
-	#page > #header {
-		padding: 50pt 12pt 8pt 12pt;
+	#page-header {
+		padding: 2pt 12pt 8pt 12pt;
 		font-size: 22pt;
 		font-weight: bold;
 		scroll-snap-align: end;
 		scroll-margin-top: 35pt;
 	}
-	#page > #content {
+	#page-content {
 		scroll-snap-align: start;
 		scroll-margin-top: calc(48pt - 1px);
+	}
+
+	@media (display-mode: standalone) {
+		#flying-header > #status-bar {
+			height: 15pt;
+			background: var(--color-status-bar);
+		}
 	}
 	
 </style>
 
 <script>
-	var page = document.querySelector("#page");
-	var flying_header = document.querySelector("#flying-header");
-	var title = document.querySelector("#flying-header #title");
-	var minY = 30;
-
-	page.addEventListener("scroll", (e) => updateScroll());
-	window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-		updateScroll();
-		flying_header.style.transition = "";
-	});
-	updateScroll();
+	window.selectedPage.onPageInit = page => {
+		var flying_header = page.querySelector("#flying-header");
+		var title = page.querySelector("#flying-header #title");
+		var minY = 30;
 	
-	function updateScroll(){
-		var scroll = page.scrollTop;
-		var delta = Math.min(Math.max(scroll / minY, 0), 1);
+		page.addEventListener("scroll", (e) => updateScroll());
+		window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+			updateScroll();
+			flying_header.style.transition = "";
+		});
+		updateScroll();
 		
-		var border_color = colorFromString(getComputedStyle(document.documentElement).getPropertyValue("--color-border-dark"));
-		var new_border_color = border_color.alpha(delta);
-
-		var background = colorFromString(getComputedStyle(document.documentElement).getPropertyValue("--color-background"));
-		var background_blurred = colorFromString(getComputedStyle(document.documentElement).getPropertyValue("--color-background-blurred"));
-		var new_background = background.mix(background_blurred, delta);
-		
-		flying_header.style.background = new_background.toCSS();
-		flying_header.style.boxShadow = `0px 1px 0px 0px ${new_border_color.toCSS()}`;
-		flying_header.style.transition = "none";
-
-		title.style.color = delta == 1 ? "var(--color-text)" : "transparent";
-	}
+		function updateScroll(){
+			var scroll = page.scrollTop;
+			var delta = Math.min(Math.max(scroll / minY, 0), 1);
+			
+			var border_color = colorFromString(getComputedStyle(document.documentElement).getPropertyValue("--color-border-dark"));
+			var new_border_color = border_color.alpha(delta);
+	
+			var background = colorFromString(getComputedStyle(document.documentElement).getPropertyValue("--color-background"));
+			var background_blurred = colorFromString(getComputedStyle(document.documentElement).getPropertyValue("--color-background-blurred"));
+			var new_background = background.mix(background_blurred, delta);
+			
+			flying_header.style.background = new_background.toCSS();
+			flying_header.style.boxShadow = `0px 1px 0px 0px ${new_border_color.toCSS()}`;
+			flying_header.style.transition = "none";
+	
+			title.style.color = delta == 1 ? "var(--color-text)" : "transparent";
+		}
+	};	
 </script>
 
 <div id="flying-header" class="blurred">
 	<div id="status-bar"></div>
-	<div id="title">${title}</div>
+	<div id="title">${page.title}</div>
 </div>
 
-<div id="header">
-	${title}
+<div id="page-header">
+	${page.title}
 </div>
 
-<div id="content"></div>
+<div id="page-content"></div>
