@@ -2,7 +2,7 @@ html {
 	--ios-fonts: -apple-system, BlinkMacSystemFont, sans-serif;
 
 	--color-background: rgba(255, 255, 255, 1);
-	--color-status-bar: rgba(190, 190, 190, 0.4);
+	--color-status-bar: rgba(70, 70, 70, 0.4);
 	--color-background-blurred: rgba(255, 255, 255, 0.65);
 
 	--color-accent: rgba(0, 122, 255);
