@@ -1,4 +1,4 @@
-﻿<html>
+﻿<html class="standalone-app">
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, viewport-fit=cover, user-scalable=no">
 		<meta http-equiv="Content-Language" content="en">
@@ -9,15 +9,20 @@
 		<meta name="apple-mobile-web-app-copable" content="yes">
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
+		<script type="text/javascript" src="tools/ios-app/ios-app.js"></script>
+		<link rel="stylesheet" href="tools/ios-app/ios-app.css">
 
-		<script type="text/javascript" src="tools/svg-loader/svg-loader.js"></script>
-		<script type="text/javascript" src="tools/downloader/downloader.js"></script>
-		<script type="text/javascript" src="tools/color/color.js"></script>
 
-		<link rel="stylesheet" href="tools/elements/elements.css">
+		<script src="tools/svg-loader.js"></script>
+		<script src="tools/color.js"></script>
+		<script src="tools/bezier-easing.js"></script>
+		
 
 		<script type="text/javascript" src="tools/elements/bottom-menu/bottom-menu.js"></script>
 		<link rel="stylesheet" href="tools/elements/bottom-menu/bottom-menu.css">
+
+		<script type="text/javascript" src="tools/elements/top-menu/top-menu.js"></script>
+		<link rel="stylesheet" href="tools/elements/top-menu/top-menu.css">
 
 		<script type="text/javascript" src="tools/elements/vertical-list/vertical-list.js"></script>
 		<link rel="stylesheet" href="tools/elements/vertical-list/vertical-list.css">
@@ -37,88 +42,12 @@
 		<script type="text/javascript" src="tools/elements/search-box/search-box.js"></script>
 		<link rel="stylesheet" href="tools/elements/search-box/search-box.css">
 
-		<style>	
-			* {
-				margin: 0px;
-				padding: 0px;
-				transition: background 0.5s ease, background-color 0.5s ease;
-			}
+	
 
-			body {
-				width: 100vw;
-				height: 100vh;
-				background-color: var(--color-background);
-				overflow: hidden;
-				/*
-				background: url("IMG_0402.png");
-				background-size: contain;
-				*/
-
-				font-family: var(--ios-fonts);
-				color: var(--color-text);
-			}
-
-			.page {
-				height: 100%;
-				width: 100%;
-				overflow: auto;
-				display: none;
-			}
-			.page.selected-page {
-				display: block;
-			}
-			.page:after {
-				content: "";
-				height: 37pt;
-				display: block;
-			}
-			#page-content {
-				padding: 0 12pt 0 12pt;
-			}
-		</style>
-		<script>
-			function menuSelected(menu){
-				var pageElement = document.querySelector(`#page_${menu.page.replaceAll("/", "-")}`);
-				
-				if(pageElement === null){
-					// Load page manifest
-					loadContent(`${menu.page}.pagemanifest`, manifestText => {
-						const manifest = JSON.parse(manifestText);
-					
-						pageElement = document.createElement("div");
-						pageElement.id = `page_${menu.page.replaceAll("/", "-")}`;
-						pageElement.classList.add("page");
-						document.body.appendChild(pageElement);
-						selectPage(pageElement);
-
-						// Load layout
-						loadContent(manifest.layout, layoutText => {
-							pageElement.innerHTML = layoutText
-								.replaceAll("${page.title}", manifest.title);
-							executeScriptsInElement(pageElement);
-
-							// Load content
-							loadContent(`${menu.page}.html`, pageText => {
-								var contentElement = pageElement.querySelector("#page-content");
-								contentElement.innerHTML = pageText;
-
-								pageElement.onPageInit(pageElement);
-							});
-						});
-					});
-				} else selectPage(pageElement);
-			}
-
-			function selectPage(pageElement){
-				if(window.selectedPage !== undefined)
-					window.selectedPage.classList.remove("selected-page");
-				window.selectedPage = pageElement;
-				pageElement.classList.add("selected-page");
-			}
-		</script>
 	</head>
 	<body>
-		
-		<bottom-menu id="menu" src="content.json" onMenuSelect="menuSelected" class="blurred"></bottom-menu>
+		<ios-app standalone manifest="app.appmanifest"></ios-app>
+		<!--
+		<img src="image.jpg" style="width: 100vw; height: calc(100vh + 38pt); opacity: 0.0; position: fixed; left: 0; top: -36pt; display: block; z-index: 100;"/> -->
 	</body>
 </html>

@@ -1,0 +1,17 @@
+﻿{
+	"tabs": [
+		{
+			"selected": true,
+			"icon": "resources/bars.svg",
+			"id": "main",
+			"text": "Главная",
+			"page": "pages/main"
+		},{
+			
+			"icon": "resources/search.svg",
+			"id": "search",
+			"text": "Поиск",
+			"page": "pages/search"
+		}
+	]
+}

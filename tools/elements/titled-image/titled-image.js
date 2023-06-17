@@ -7,7 +7,7 @@ class TitledImage extends HTMLElement {
 			<div id="l2">April - Пазлы по номерам</div>
 			<div id="l3">Собирайте необычные пазлы</div>
 			<div id="auto-ratio">
-				<img id="image" src="resources/image.jpg"/>
+				<img id="image" src="resources/image.jpg" onclick="document.querySelector('ios-app').showNewPage('pages/test')"/>
 			</div>
 		`;
 	}

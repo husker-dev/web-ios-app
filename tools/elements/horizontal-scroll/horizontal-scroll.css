@@ -4,7 +4,6 @@ horizontal-scroll {
 	overflow: scroll;
 
 	scroll-snap-type: x mandatory;
-	scroll-snap-stop: always;
 	scroll-padding-left: 12pt;
 	scrollbar-width: none;
 
@@ -21,6 +20,7 @@ horizontal-scroll > horizontal-scroll-element {
 	min-width: calc(100% - 24pt);
 	max-width: 300pt;
 	scroll-snap-align: start;
+	scroll-snap-stop: always;
 }
 
 horizontal-scroll > horizontal-scroll-element > * {
@@ -39,9 +39,7 @@ horizontal-scroll > horizontal-scroll-element:last-child {
 	padding-right: 12pt;
 }
 
-
-@media (min-width: 600px) {
-	horizontal-scroll > .horizontal-scroll-element {
-		min-width: 300pt;
-	}
+.large-screen horizontal-scroll > horizontal-scroll-element {
+	min-width: 300pt;
 }
+

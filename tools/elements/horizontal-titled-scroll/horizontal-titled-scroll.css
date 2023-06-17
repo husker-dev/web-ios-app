@@ -51,7 +51,7 @@ horizontal-titled-scroll #blocks {
 	overflow: scroll;
 
 	scroll-snap-type: x mandatory;
-	scroll-snap-stop: always;
+	
 	scroll-padding-left: 12pt;
 	scroll-padding-right: 12pt;
 	scrollbar-width: none;
@@ -64,6 +64,7 @@ horizontal-titled-scroll #blocks::-webkit-scrollbar {
 horizontal-titled-scroll #blocks > * {
 	min-width: calc(100% - 24pt);
 	scroll-snap-align: start;
+	scroll-snap-stop: always;
 }
 
 horizontal-titled-scroll #blocks > * + * {
@@ -79,8 +80,7 @@ horizontal-titled-scroll #blocks > *:last-child {
 }
 
 
-@media (min-width: 600px) {
-	horizontal-titled-scroll #blocks > * {
-		min-width: 300pt;
-	}
+.large-screen horizontal-titled-scroll #blocks > * {
+	min-width: 300pt;
 }
+
