@@ -1,0 +1,86 @@
+horizontal-titled-scroll {
+	width: calc(100% + 24pt);
+	display: flex;
+	flex-direction: column;
+	padding-bottom: 23pt;
+	margin-left: -12pt;
+}
+
+horizontal-titled-scroll > #head {
+	width: calc(100% - 24pt);
+	border-top: solid var(--color-border) 1px;
+	display: flex;
+	padding-bottom: 4pt;
+	margin: 0 12pt 0 12pt;
+}
+
+
+horizontal-titled-scroll > #head > #head_left {
+	flex: 1;
+}
+
+horizontal-titled-scroll #title {
+	font-weight: bold;
+	font-size: 16pt;
+	height: 28pt;
+	vertical-align: bottom;
+	display: table-cell;
+}
+
+horizontal-titled-scroll #description {
+	color: var(--color-text-primary);
+	padding-top: 2pt;
+}
+
+horizontal-titled-scroll #more {
+	color: var(--color-accent);
+	font-size: 13pt;
+	height: 28pt;
+	vertical-align: bottom;
+	display: table-cell;
+	padding-bottom: 1pt;
+}
+
+/*
+	Scroll
+*/
+
+horizontal-titled-scroll #blocks {
+	display: flex;
+	width: 100%;
+	overflow: scroll;
+
+	scroll-snap-type: x mandatory;
+	
+	scroll-padding-left: 12pt;
+	scroll-padding-right: 12pt;
+	scrollbar-width: none;
+}
+
+horizontal-titled-scroll #blocks::-webkit-scrollbar {
+	display: none;
+}
+
+horizontal-titled-scroll #blocks > * {
+	min-width: calc(100% - 24pt);
+	scroll-snap-align: start;
+	scroll-snap-stop: always;
+}
+
+horizontal-titled-scroll #blocks > * + * {
+	margin-left: 6pt;
+}
+
+horizontal-titled-scroll #blocks > *:first-child {
+	padding-left: 12pt;
+}
+
+horizontal-titled-scroll #blocks > *:last-child {
+	padding-right: 12pt;
+}
+
+
+.large-screen horizontal-titled-scroll #blocks > * {
+	min-width: 300pt;
+}
+

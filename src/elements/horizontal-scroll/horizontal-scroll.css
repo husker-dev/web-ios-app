@@ -1,0 +1,45 @@
+horizontal-scroll {
+	display: flex;
+	width: calc(100% + 24pt);
+	overflow: scroll;
+
+	scroll-snap-type: x mandatory;
+	scroll-padding-left: 12pt;
+	scrollbar-width: none;
+
+	margin-left: -12pt;
+	padding-bottom: 23pt;
+}
+
+horizontal-scroll::-webkit-scrollbar {
+	display: none;
+}
+
+horizontal-scroll > horizontal-scroll-element {
+	display: grid;
+	min-width: calc(100% - 24pt);
+	max-width: 300pt;
+	scroll-snap-align: start;
+	scroll-snap-stop: always;
+}
+
+horizontal-scroll > horizontal-scroll-element > * {
+	border-top: solid var(--color-border) 1px;
+}
+
+horizontal-scroll > horizontal-scroll-element + horizontal-scroll-element {
+	margin-left: 6pt;
+}
+
+horizontal-scroll > horizontal-scroll-element:first-child {
+	padding-left: 12pt;
+}
+
+horizontal-scroll > horizontal-scroll-element:last-child {
+	padding-right: 12pt;
+}
+
+.large-screen horizontal-scroll > horizontal-scroll-element {
+	min-width: 300pt;
+}
+

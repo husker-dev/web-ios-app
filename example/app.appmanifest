@@ -1,0 +1,22 @@
+﻿{
+	"tabs": [
+		{
+			"selected": true,
+			"icon": "../src/ios-svg/wrench.svg",
+			"id": "test",
+			"text": "Тест",
+			"page": "pages/test"
+		},{
+			"icon": "../src/ios-svg/bars.svg",
+			"id": "main",
+			"text": "Главная",
+			"page": "pages/main"
+		},{
+			
+			"icon": "../src/ios-svg/search.svg",
+			"id": "search",
+			"text": "Поиск",
+			"page": "pages/search"
+		}
+	]
+}
