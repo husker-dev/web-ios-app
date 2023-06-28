@@ -1,6 +1,7 @@
 ios-app * {
 	margin: 0px;
 	padding: 0px;
+	-webkit-user-select: none;
 }
 
 ios-app {
@@ -24,7 +25,9 @@ ios-app {
 
 	--color-text: black;
 	--color-text-primary: rgba(138, 138, 142);
+	--color-text-secondary: rgba(57, 56, 61);
 
+	--color-active: rgba(47, 209, 89);
 	--color-primary: rgba(238, 238, 240);
 	
 	--color-border: rgba(200, 200, 200);

@@ -19,6 +19,11 @@ list-table > * *[slot="left"]{
 	margin-right: 12pt;
 }
 
+list-table > * img[slot="left"]{
+	height: 29px;
+	width: 29px;
+}
+
 list-table > *:last-child{
 	--border-color: transparent;
 }

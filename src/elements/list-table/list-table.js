@@ -79,7 +79,7 @@ class ButtonListItem extends EmptyListItem {
 				}
 
 				#arrow {
-					color: var(--color-text-primary);
+					color: var(--color-text-secondary);
 					margin-left: 6pt;
 				}
 			</style>
@@ -91,6 +91,15 @@ class ButtonListItem extends EmptyListItem {
 	}
 }
 
+class CheckboxListItem extends EmptyListItem {
+
+	connectedCallback() {
+		super.connectedCallback();
+		this.innerHTML += `<ios-checkbox slot="primary"></ios-checkbox>`;
+	}
+}
+
 window.customElements.define('list-table', ListTable);
 window.customElements.define('list-item', EmptyListItem);
 window.customElements.define('list-item-button', ButtonListItem);
+window.customElements.define('list-item-checkbox', CheckboxListItem);

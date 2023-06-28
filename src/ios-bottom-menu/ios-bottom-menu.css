@@ -17,7 +17,7 @@ ios-bottom-menu {
 	z-index: 3;
 }
 
-ios-bottom-menu > .button {
+ios-bottom-menu > ios-bottom-menu-item {
 	flex: 1;
 	color: var(--color-accent-inactive);
 	font-size: 8pt;
@@ -28,15 +28,13 @@ ios-bottom-menu > .button {
 	flex-direction: column;
 	justify-content: flex-end;
 	align-items: center;
-	
-	-webkit-user-select: none;
 }
 
-ios-bottom-menu > .button.selected {
+ios-bottom-menu > ios-bottom-menu-item.selected {
 	color: var(--color-accent);
 }
 
-ios-bottom-menu > .button > svg {
+ios-bottom-menu > ios-bottom-menu-item > svg {
 	width: 17pt;
 	height: 17pt;
 }
@@ -51,7 +49,7 @@ ios-app[standalone] ios-bottom-menu {
 	height: calc(var(--bottom-menu-height) - env(safe-area-inset-bottom));
 }
 
-ios-app.large-screen ios-bottom-menu > .button {
+ios-app.large-screen ios-bottom-menu > ios-bottom-menu-item {
 	flex-direction: row;
 	justify-content: center;
 	font-size: 10pt;

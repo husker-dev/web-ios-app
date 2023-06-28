@@ -31,7 +31,6 @@ class IOSTopMenu extends HTMLElement {
 			<div id="additional"></div>
 		`;
 		
-		var statusbar = this.querySelector("#statusbar");
 		var backBlock = this.querySelector("#controls #back");
 		var toolsBlock = this.querySelector("#controls #tools");
 
@@ -52,7 +51,7 @@ class IOSTopMenu extends HTMLElement {
 		backBlock.addEventListener("touchend", e => {
 			backBlock.classList.remove("active");
 		});
-		backBlock.addEventListener("click", e => that.app.goToPreviousPage());
+		backBlock.addEventListener("click", e => that.app.selectedTab.goToPreviousPage());
 
 		// Controls
 		var sizeUpdater = () => {
@@ -80,7 +79,6 @@ class IOSTopMenu extends HTMLElement {
 					page.prevPage?.header.getTitleElement() ?? null,
 					that.backTextElement,
 				);
-
 				this.setElementsOpacity(showAnimationElements,
 					that.titleAnimElement,
 					that.titleAnimElement1,
@@ -117,153 +115,166 @@ class IOSTopMenu extends HTMLElement {
 	bindApp(app){
 		this.app = app;
 		var that = this;
-		app.addEventListener("page-loaded", e => {
+		app.addEventListener("page-created", e => {
 			var page = e.detail.page;
 			var headerName = page.manifest.header === undefined ? "default" : page.manifest.header;
 			page.header = that.styles[headerName](page);
 
 			page.addEventListener("scroll", scrollEvent => that.updateHeaderOpacity(page));
 		});
+
+		app.addEventListener("page-selected", e => {
+			var page = e.detail.page;
+
+			this.titleElement.innerHTML = page.manifest.title;
+			this.backTextElement.innerHTML = page.prevPage?.manifest.title ?? "\u00a0";
+			this.backArrowElement.style.opacity = page.prevPage === undefined ? "0" : "";
+		});
+
+		app.addEventListener("transition-started", e => {
+			var page = e.detail.page;
+			this.animation.activePage = page;
+			this.tools.setAnimationElementsVisibility(page, true);
+
+			// Setting text to animation elements
+			this.titleAnimElement.innerHTML = page.prevPage?.manifest.title ?? "";
+			this.titleAnimElement1.innerHTML = page.manifest.title;
+			this.backTextAnimElement.innerHTML = page.prevPage?.manifest.title ?? "";
+			this.backTextAnimElement1.innerHTML = page.prevPage?.prevPage?.manifest.title ?? "";
+
+			// Pre-calculate positions
+			this.animation.backTextPosition = this.tools.getRelativeCoordinates(
+				this.tools.getTextCoordinates(this.backTextElement), 
+				this.app);
+			this.animation.titlePosOld = page.prevPage?.header.getTitlePosition() ?? { x: 0, y: 0};
+			this.animation.titlePosNew = this.tools.getRelativeCoordinates(
+				this.tools.getTextCoordinates(this.titleElement, page.manifest.title), 
+				this);
+
+			// Save title font sizes
+			this.animation.fontSizeOld = page.prevPage !== undefined ? parseFloat(getComputedStyle(page.prevPage.header.getTitleElement()).fontSize) : 0;
+			this.animation.fontSizeNew = parseFloat(getComputedStyle(this.backTextElement).fontSize);
+		});
+
+		app.addEventListener("transition-completed", e => {
+			var page = e.detail.page;
+			var isEnd = e.detail.isEnd;
+			if(this.animation.activePage != page)
+				return
+			this.tools.setAnimationElementsVisibility(page, false);
+
+			this.titleElement.innerHTML = isEnd ? page.manifest.title : (page.prevPage?.manifest.title ?? "");
+			this.backTextElement.innerHTML = isEnd ? (page.prevPage?.manifest.title ?? "\u00a0") : (page.prevPage?.prevPage?.manifest.title ?? "\u00a0");
+
+			this.backArrowElement.style.opacity = isEnd ? (page.prevPage === undefined ? "0" : "") : (page.prevPage?.prevPage === undefined ? "0" : "");
+		});
+
+		app.addEventListener("transition", e => {
+			var page = e.detail.page;
+			var percent = e.detail.percent;
+			if(page.tab != this.app.selectedTab || this.animation.activePage != page)
+				return;
+
+			var backTextPosition = this.animation.backTextPosition;
+			var titlePosOld = this.animation.titlePosOld;
+			var titlePosNew = this.animation.titlePosNew;
+
+			var fontSizeOld = this.animation.fontSizeOld;
+			var fontSizeNew = this.animation.fontSizeNew;
+			var nPercent = 1 - percent;
+
+			// Sliding to center title
+			this.titleAnimElement.style.transform = `translate(${backTextPosition.x + (titlePosOld.x - backTextPosition.x) * nPercent}px, ${backTextPosition.y + (titlePosOld.y - backTextPosition.y) * nPercent}px) scale(${1 - (1 - fontSizeNew / fontSizeOld) * percent})`;
+			this.titleAnimElement.style.fontSize = `${fontSizeOld}px`;
+			this.titleAnimElement.style.opacity = 1 - percent * 1.5;
+
+			// Sliding to right title
+			this.titleAnimElement1.style.transform = `translate(${titlePosNew.x + titlePosNew.x * nPercent}px, ${titlePosNew.y}px)`;
+			this.titleAnimElement1.style.opacity = 1 - nPercent * 3;
+
+			// Back arrow
+			if(page.prevPage.header.useYAxis){
+				this.backArrowElement.style.opacity = page.prevPage?.prevPage === undefined ? percent * 10 - 8 : "";
+				this.backArrowElement.style.transform = `scale(${percent * 2 - 1})`;
+			}else {
+				this.backArrowElement.style.opacity = page.prevPage?.prevPage === undefined ? percent : "";
+				this.backArrowElement.style.transform = "";
+			}
+
+			// Blue text sliding to center
+			this.backTextAnimElement.style.transform = `translate(${backTextPosition.x + (titlePosOld.x - backTextPosition.x) * nPercent}px, ${backTextPosition.y + (titlePosOld.y - backTextPosition.y) * nPercent}px) scale(${1 + (1 - fontSizeNew / fontSizeOld) * nPercent * 2})`;
+			this.backTextAnimElement.style.fontSize = `${fontSizeNew}px`;
+			this.backTextAnimElement.style.opacity = 1 - nPercent * 1.5;
+
+			// Blue text sliding to left
+			var backTextAnimElement1X = backTextPosition.x - 100 * percent;
+			var clipX = parseFloat(backTextPosition.x - 18 - backTextAnimElement1X);
+			this.backTextAnimElement1.style.transform = `translate(${backTextAnimElement1X}px, ${titlePosNew.y}px)`;
+			this.backTextAnimElement1.style.clipPath = `polygon(${clipX + 15}px 0, 100% 0, 100% 100%, ${clipX + 15}px 100%, ${clipX}px 50%)`;
+			this.backTextAnimElement1.style.opacity = 1 - percent * 2;
+		});
 	}
 
 	updateHeaderOpacity(page){
-		console.log(page.scrollTop);
-	}
-
-	animationStarted(page){
-		this.animation.activePage = page;
-		this.tools.setAnimationElementsVisibility(page, true);
-
-		// Setting text to animation elements
-		this.titleAnimElement.innerHTML = page.prevPage?.manifest.title ?? "";
-		this.titleAnimElement1.innerHTML = page.manifest.title;
-		this.backTextAnimElement.innerHTML = page.prevPage?.manifest.title ?? "";
-		this.backTextAnimElement1.innerHTML = page.prevPage?.prevPage?.manifest.title ?? "";
-
-		// Pre-calculate positions
-		this.animation.backTextPosition = this.tools.getRelativeCoordinates(
-			this.tools.getTextCoordinates(this.backTextElement), 
-			this.app);
-		this.animation.titlePosOld = page.prevPage?.header.getTitlePosition() ?? { x: 0, y: 0};
-		this.animation.titlePosNew = this.tools.getRelativeCoordinates(
-			this.tools.getTextCoordinates(this.titleElement, page.manifest.title), 
-			this);
-
-		// Save title font sizes
-		this.animation.fontSizeOld = page.prevPage !== undefined ? parseFloat(getComputedStyle(page.prevPage.header.getTitleElement()).fontSize) : 0;
-		this.animation.fontSizeNew = parseFloat(getComputedStyle(this.backTextElement).fontSize);
-	}
-
-	animationFinished(page, isEnd){
-		if(this.animation.activePage != page)
-			return
-		this.tools.setAnimationElementsVisibility(page, false);
-
-		this.titleElement.innerHTML = isEnd ? page.manifest.title : (page.prevPage?.manifest.title ?? "");
-		this.backTextElement.innerHTML = isEnd ? (page.prevPage?.manifest.title ?? "\u00a0") : (page.prevPage?.prevPage?.manifest.title ?? "\u00a0");
-
-		this.backArrowElement.style.opacity = isEnd ? (page.prevPage === undefined ? "0" : "") : (page.prevPage?.prevPage === undefined ? "0" : "");
-	}
-
-	animateTransition(page, percent){
-		if(page.tab != this.app.selectedTabElement || this.animation.activePage != page)
-			return;
-
-		var backTextPosition = this.animation.backTextPosition;
-		var titlePosOld = this.animation.titlePosOld;
-		var titlePosNew = this.animation.titlePosNew;
-
-		var fontSizeOld = this.animation.fontSizeOld;
-		var fontSizeNew = this.animation.fontSizeNew;
-		var nPercent = 1 - percent;
-
-		// Sliding to center title
-		this.titleAnimElement.style.transform = `translate(${backTextPosition.x + (titlePosOld.x - backTextPosition.x) * nPercent}px, ${backTextPosition.y + (titlePosOld.y - backTextPosition.y) * nPercent}px) scale(${1 - (1 - fontSizeNew / fontSizeOld) * percent})`;
-		this.titleAnimElement.style.fontSize = `${fontSizeOld}px`;
-		this.titleAnimElement.style.opacity = 1 - percent * 1.5;
-
-		// Sliding to right title
-		this.titleAnimElement1.style.transform = `translate(${titlePosNew.x + titlePosNew.x * nPercent}px, ${titlePosNew.y}px)`;
-		this.titleAnimElement1.style.opacity = 1 - nPercent * 3;
-
-		// Back arrow
-		if(page.prevPage.header.useYAxis){
-			this.backArrowElement.style.opacity = page.prevPage?.prevPage === undefined ? percent * 10 - 8 : "";
-			this.backArrowElement.style.transform = `scale(${percent * 2 - 1})`;
-		}else {
-			this.backArrowElement.style.opacity = page.prevPage?.prevPage === undefined ? percent : "";
-			this.backArrowElement.style.transform = "";
-		}
-
-		// Blue text sliding to center
-		this.backTextAnimElement.style.transform = `translate(${backTextPosition.x + (titlePosOld.x - backTextPosition.x) * nPercent}px, ${backTextPosition.y + (titlePosOld.y - backTextPosition.y) * nPercent}px) scale(${1 + (1 - fontSizeNew / fontSizeOld) * nPercent * 2})`;
-		this.backTextAnimElement.style.fontSize = `${fontSizeNew}px`;
-		this.backTextAnimElement.style.opacity = 1 - nPercent * 1.5;
-
-		// Blue text sliding to left
-		var backTextAnimElement1X = backTextPosition.x - 100 * percent;
-		var clipX = parseFloat(backTextPosition.x - 18 - backTextAnimElement1X);
-		this.backTextAnimElement1.style.transform = `translate(${backTextAnimElement1X}px, ${titlePosNew.y}px)`;
-		this.backTextAnimElement1.style.clipPath = `polygon(${clipX + 15}px 0, 100% 0, 100% 100%, ${clipX + 15}px 100%, ${clipX}px 50%)`;
-		this.backTextAnimElement1.style.opacity = 1 - percent * 2;
+		// TODO: Header visibility by scrollTop value
 	}
 }
 
 class IOSTopMenuStyle {
-		useYAxis = false;
-		triggerY = 0;
-		triggerSize = 5;
+	useYAxis = false;
+	triggerY = 0;
+	triggerSize = 5;
 
-		constructor(menu, page){
-			this.page = page;
-			this.menu = menu;
-			this.header = page.querySelector("#page-header");
+	constructor(menu, page){
+		this.page = page;
+		this.menu = menu;
+		this.header = page.querySelector("#page-header");
 
-			this.header.style.paddingTop = "calc(env(safe-area-inset-top) + 44px)";
-		}
+		this.header.style.paddingTop = "calc(env(safe-area-inset-top) + 44px)";
+	}
 
-		getTitleElement() {
-			return this.menu.titleElement;
-		}
+	getTitleElement() {
+		return this.menu.titleElement;
+	}
 
-		getTitlePosition() {
-			var elementRect = this.menu.tools.getTextCoordinates(this.getTitleElement(), this.page.manifest.title);
-			var appRect = this.menu.app.getBoundingClientRect();
-			return { x: elementRect.left - appRect.left, y: elementRect.top - appRect.top };
-		}
+	getTitlePosition() {
+		var elementRect = this.menu.tools.getTextCoordinates(this.getTitleElement(), this.page.manifest.title);
+		var appRect = this.menu.app.getBoundingClientRect();
+		return { x: elementRect.left - appRect.left, y: elementRect.top - appRect.top };
+	}
 }
 
 class TitledIOSTopMenuStyle extends IOSTopMenuStyle {
-		useYAxis = true;
-		triggerY = 50;
+	useYAxis = true;
+	triggerY = 50;
 
-		constructor(menu, page){
-			super(menu, page);
-			
-			this.header.style.paddingTop = "env(safe-area-inset-top)";
-			this.header.innerHTML = `
-				<style>
-					#header-title {
-						padding-top: 44px;
-						padding-left: 12pt;
-						font-size: 24pt;
-						font-weight: bold;
-					}
-				</style>
-				<div id="header-title">${page.manifest.title}</div>
-			`;
-			this.titleElement = this.header.querySelector("#header-title");
-		}
+	constructor(menu, page){
+		super(menu, page);
+		
+		this.header.style.paddingTop = "env(safe-area-inset-top)";
+		this.header.innerHTML = `
+			<style>
+				#header-title {
+					padding-top: 44px;
+					padding-left: 12pt;
+					font-size: 24pt;
+					font-weight: bold;
+				}
+			</style>
+			<div id="header-title">${page.manifest.title}</div>
+		`;
+		this.titleElement = this.header.querySelector("#header-title");
+	}
 
-		getTitleElement() {
-			return this.titleElement;
-		}
+	getTitleElement() {
+		return this.titleElement;
+	}
 
-		getTitlePosition() {
-			var position = super.getTitlePosition();
-			position.x += this.menu.getBoundingClientRect().left - this.page.getBoundingClientRect().left;
-			return position;
-		}
+	getTitlePosition() {
+		var position = super.getTitlePosition();
+		position.x += this.menu.getBoundingClientRect().left - this.page.getBoundingClientRect().left;
+		return position;
+	}
 }
 
 window.customElements.define('ios-top-menu', IOSTopMenu);

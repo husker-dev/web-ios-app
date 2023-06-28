@@ -1,187 +1,253 @@
 
 function openPage(element, page){
-	
-	while(element != window.body && !(element instanceof IOSApp))
+	while(element != window.body && !(element instanceof IOSTab))
 		element = element.parentElement;
 	
-	if(element instanceof IOSApp)
+	if(element instanceof IOSTab)
 		element.showNewPage(page);
 }
 
+/*
+	Events:
+		- transition-started
+		- transition-completed
+		- transition
+		- tab-created
+		- tab-selected
+		- tab-deselected
+		- page-created
+		- page-selected
+		- page-deselected
+*/
 class IOSApp extends HTMLElement {
 
 	connectedCallback() {
+		var that = this;
+
 		this.innerHTML = `
 			<ios-top-menu></ios-top-menu>
-			<ios-bottom-menu id="bottom-menu" class="blurred"></ios-bottom-menu>
+			<ios-bottom-menu class="blurred"></ios-bottom-menu>
 		`;
-		var that = this;
 		this.topMenu = this.querySelector("ios-top-menu");
-		this.bottomMenu = this.querySelector("#bottom-menu");
+		this.bottomMenu = this.querySelector("ios-bottom-menu");
+
+		this.bottomMenu.bindApp(this);
+		this.topMenu.bindApp(this);
 
 		new ResizeObserver(() => {
-			that.getBoundingClientRect().right >= 600 ? 
+			that.getBoundingClientRect().right - that.getBoundingClientRect().left >= 600 ? 
 				that.classList.add("large-screen") : 
 				that.classList.remove("large-screen");
 		}).observe(this);
 
-		this.bottomMenu.onTabSelect = (tab) => that.showTabElement(that.querySelector(`#tab_${tab.id.replaceAll("/", "-")}`));
-		this.bottomMenu.onTabLoaded = (tab) => {
-			var tabElement = document.createElement("ios-tab");
-			tabElement.id = `tab_${tab.id.replaceAll("/", "-")}`;
-			tabElement.manifest = tab;
-			that.appendChild(tabElement);
-		};
-		this.bottomMenu.loadManifest(this.getAttribute("manifest"));
-		this.topMenu.bindApp(this);
+		// Load app manifest content
+		fetch(this.getAttribute("manifest")).then(d => d.json())
+		.then(appManifest => {
+			appManifest.tabs.forEach(tabManifest => that.createTab(tabManifest));
+		});
 	}
 
-	bindPageGestures(tab, pageElement){
+	showTab(tabId){
+		var tab = this.querySelector(`#tab_${tabId}`);
+
+		this.selectedTab?.deselected();
+		this.selectedTab = tab;
+		tab.selected();
+	}
+
+	createTab(tabManifest){
 		var that = this;
-		pageElement.gesture = { started: false, percent: 0, startX: 0, speed: 0, currentX: 0, lastX: 0, width: 0 };
-
-		pageElement.addEventListener("touchstart", (e) => {
-			var touchX = e.touches[0].clientX - tab.getBoundingClientRect().left;
-			if(pageElement.prevPage !== undefined && e.touches.length == 1 && touchX < 25){
-				e.preventDefault();
-				pageElement.gesture.started = true;
-				pageElement.gesture.percent = 0;
-				pageElement.gesture.startX = touchX;
-				pageElement.gesture.width = pageElement.getBoundingClientRect().right - pageElement.getBoundingClientRect().left;
-
-				this.animationStarted(pageElement);
-				this.processAnimationFrame(pageElement, 1);
-			}
-		});
-		pageElement.addEventListener("touchend", (e) => {
-			if(pageElement.gesture.started){
-				pageElement.gesture.started = false;
-				var percent = pageElement.gesture.percent;
-				//this.animationFinished(pageElement, false);
-
-				if(percent > 0.5 || pageElement.gesture.speed > 5){
-					this.animateTransition(pageElement, 400, a => (1-percent) - (1-percent) * a);
-					setTimeout(() => that.goToPreviousPage(pageElement.prevPage, false), 400);
-				}
-				else this.animateTransition(pageElement, 400, a => (1-percent) + percent * a);
-			}
-		});
-		pageElement.addEventListener("touchmove", (e) => {
-			if(pageElement.gesture.started && e.touches.length == 1){
-
-				pageElement.gesture.previousX = pageElement.gesture.currentX;
-				pageElement.gesture.currentX = e.touches[0].clientX - tab.getBoundingClientRect().left;
-				pageElement.gesture.speed = pageElement.gesture.currentX - pageElement.gesture.previousX;
-				pageElement.gesture.percent = (pageElement.gesture.currentX - pageElement.gesture.startX) / pageElement.gesture.width;
-
-				that.processAnimationFrame(pageElement, 1 - pageElement.gesture.percent);
-				e.preventDefault();
-			}
-		});
-	}
-
-	showTabElement(tabElement){
-		if(this.selectedTabElement !== undefined)
-			this.selectedTabElement.classList.remove("selected-tab");
-		this.selectedTabElement = tabElement;
-		tabElement.classList.add("selected-tab");
-
-		// If tab is empty, then create page, otherwise show current page
-		if(tabElement.selectedPage == undefined)
-			this.showNewPage(tabElement.manifest.page);
-		else {
-			//this.processAnimationFrame(tabElement.selectedPage, 1);
-		}
-	}
-
-	showNewPage(page){
-		var that = this;
-		var tab = this.selectedTabElement;
-
-		fetch(`${page}.pagemanifest`).then(d => d.json())
-		.then(manifest => {
-			var pageElement = document.createElement("ios-page");
-			pageElement.id = `page_${page.replaceAll("/", "-")}`;
-			pageElement.manifest = manifest;
-			tab.appendChild(pageElement);
-			
-			// Set page as current
-			pageElement.prevPage = tab.selectedPage;
-			pageElement.tab = tab;
-			tab.selectedPage = pageElement;
-
-			// Dispatch events
-			that.dispatchEvent(new CustomEvent("page-loaded", { detail: { page: pageElement } }));
+		var tab = document.createElement("ios-tab");
+		tab.id = `tab_${tabManifest.id}`;
+		tab.app = this;
+		tab.manifest = tabManifest;
 		
-			// Show new page
-			if(pageElement.prevPage === undefined){
-				this.animationStarted(pageElement);
-				this.animationFinished(pageElement, true);
-			}
-			else this.animateTransition(pageElement, 600);
+		// Translate tab events to app
+		tab.addEventListener("tab-created", e => that.dispatchEvent(new e.constructor(e.type, e)));
+		tab.addEventListener("tab-selected", e => that.dispatchEvent(new e.constructor(e.type, e)));
+		tab.addEventListener("tab-deselected", e => that.dispatchEvent(new e.constructor(e.type, e)));
+		tab.addEventListener("page-created", e => that.dispatchEvent(new e.constructor(e.type, e)));
+		tab.addEventListener("page-selected", e => that.dispatchEvent(new e.constructor(e.type, e)));
+		tab.addEventListener("page-deselected", e => that.dispatchEvent(new e.constructor(e.type, e)));
 
-			// Binding swipe gesture
-			that.bindPageGestures(tab, pageElement);
+		this.appendChild(tab);
 
-			// Load page content
-			fetch(`${page}.html`).then(d => d.text())
-			.then(content => {
-				pageElement.querySelector("#page-content").innerHTML = content;
-			});
-		});
+		if(tab.manifest.selected)
+			this.showTab(tabManifest.id);
 	}
 
-	goToPreviousPage(page = this.selectedTabElement.selectedPage.prevPage, animate = true){
-		var lastPage = this.selectedTabElement.selectedPage;
-		this.selectedTabElement.selectedPage = page;
-
-		if(animate){
-			this.animateTransition(lastPage, 400, p => 1-p);
-			setTimeout(() => this.selectedTabElement.removeChild(lastPage), 400);
-		} else this.selectedTabElement.removeChild(lastPage);
-	}
-
-	animateTransition(page, duration, transform = percent => percent) {
+	_animateTransition(page, duration, transform = percent => percent) {
 		var easing = bezier(0.2, 0.8, 0.2, 1);
   		var start = Date.now();
   		var that = this;
-  		this.animationStarted(page);
+  		this._transitionStarted(page);
   		(function loop () {
     		var p = (Date.now()-start)/duration;
-    		if (p > 1){
-      			that.processAnimationFrame(page, transform(1));
-    			that.animationFinished(page, transform(1) == 1);
-    		}
-    		else {
-      			that.processAnimationFrame(page, transform(easing(p)));
+    		if (p >= 1){
+      			that._processTransitionFrame(page, transform(1));
+    			that._transitionCompleted(page, transform(1) == 1);
+    		}else {
+      			that._processTransitionFrame(page, transform(easing(p)));
       			requestAnimationFrame(loop);
     		}
   		}());
 	}
 
-	animationStarted(page){
-		this.topMenu.animationStarted(page);
+	_transitionStarted(page){
+		this.dispatchEvent(new CustomEvent("transition-started", { detail: { page: page } }));
 	}
 
-	animationFinished(page, isEnd){
-		this.topMenu.animationFinished(page, isEnd);
+	_transitionCompleted(page, isEnd){
+		this.dispatchEvent(new CustomEvent("transition-completed", { detail: { page: page, isEnd: isEnd } }));
 	}
 
-	processAnimationFrame(page, percent){
-		this.topMenu.animateTransition(page, percent);
-		page.style.transform = "translateX(" + (100 - percent * 100) + "%)";
-		if(page.prevPage !== undefined)
-			page.prevPage.style.transform = "translateX(" + (-percent * 30) + "%)";
+	_processTransitionFrame(page, percent){
+		page.style.transform = `translateX(${(1-percent) * 100}%)`;
+		page.prevPage.style.transform = `translateX(${percent * -30}%)`;
+
+		this.dispatchEvent(new CustomEvent("transition", { detail: { page: page, percent: percent } }));
 	}
 }
 
-window.customElements.define('ios-app', IOSApp);
-window.customElements.define('ios-tab', class extends HTMLElement {});
-window.customElements.define('ios-page', class extends HTMLElement {
+class IOSTab extends HTMLElement {
+
+	connectedCallback() {
+		this.dispatchEvent(new CustomEvent("tab-created", { detail: { tab: this } }));
+	}
+
+	showNewPage(pagePath){
+		var that = this;
+
+		fetch(`${pagePath}.pagemanifest`).then(d => d.json())
+		.then(pageManifest => {
+			var page = document.createElement("ios-page");
+			page.id = `page_${pagePath.replaceAll("/", "-")}`;
+			page.manifest = pageManifest;
+			page.prevPage = this.selectedPage;
+			page.tab = this;
+			page.app = that.app;
+			page.path = pagePath;
+			
+			// Translate page events to tab
+			page.addEventListener("page-created", e => that.dispatchEvent(new e.constructor(e.type, e)));
+			page.addEventListener("page-selected", e => that.dispatchEvent(new e.constructor(e.type, e)));
+			page.addEventListener("page-deselected", e => that.dispatchEvent(new e.constructor(e.type, e)));
+			this.appendChild(page);
+
+			// Animate new page
+			if(page.prevPage !== undefined){
+				this.app._animateTransition(page, 600);
+				setTimeout(() => this._setSelectedPage(page), 600);
+			}
+			else this._setSelectedPage(page);
+		});
+	}
+
+	goToPreviousPage(page = this.selectedPage.prevPage){
+		var currentPage = this.selectedPage;
+		this.app._animateTransition(currentPage, 400, p => 1-p);
+		setTimeout(() => {
+			this._removePage(currentPage)
+			this._setSelectedPage(page);
+		}, 400);
+	}
+
+	selected(){
+		this.classList.add("selected-tab");
+		this.dispatchEvent(new CustomEvent("tab-selected", { detail: { tab: this } }));
+		if(this.selectedPage == undefined)
+			this.showNewPage(this.manifest.page);
+	}
+
+	deselected(){
+		this.classList.remove("selected-tab");
+		this.dispatchEvent(new CustomEvent("tab-deselected", { detail: { tab: this } }));
+	}
+
+	_setSelectedPage(page){
+		this.selectedPage?.deselected();
+		this.selectedPage = page;
+		page.selected();
+	}
+
+	_removePage(page){
+		this.removeChild(page);
+	}
+}
+
+class IOSPage extends HTMLElement {
 	connectedCallback() {
 		this.innerHTML = `
 			<div id="page-header"></div>
 			<div id="page-content"></div>
 		`;
+		this.dispatchEvent(new CustomEvent("page-created", { detail: { page: this } }));
+		this._bindTouchGestures();
+		this._loadContent();
 	}
-});
+
+	selected(){
+		this.dispatchEvent(new CustomEvent("page-selected", { detail: { page: this } }));
+	}
+
+	deselected(){
+		this.dispatchEvent(new CustomEvent("page-deselected", { detail: { page: this } }));
+	}
+
+	_loadContent(){
+		fetch(`${this.path}.html`).then(d => d.text())
+		.then(content => {
+			this.querySelector("#page-content").innerHTML = content;
+		});
+	}
+
+	_bindTouchGestures(){
+		this.gesture = { started: false, percent: 0, startX: 0, speed: 0, currentX: 0, lastX: 0, width: 0 };
+
+		this.addEventListener("touchstart", (e) => {
+			var touchX = e.touches[0].clientX - this.tab.getBoundingClientRect().left;
+			if(this.prevPage !== undefined && e.touches.length == 1 && touchX < 25){
+
+				this.gesture.started = true;
+				this.gesture.percent = 0;
+				this.gesture.startX = touchX;
+				this.gesture.width = this.getBoundingClientRect().right - this.getBoundingClientRect().left;
+
+				this.app._transitionStarted(this);
+				this.app._processTransitionFrame(this, 1);
+				e.preventDefault();
+			}
+		});
+		this.addEventListener("touchmove", (e) => {
+			if(this.gesture.started && e.touches.length == 1){
+
+				this.gesture.previousX = this.gesture.currentX;
+				this.gesture.currentX = e.touches[0].clientX - this.tab.getBoundingClientRect().left;
+				this.gesture.speed = this.gesture.currentX - this.gesture.previousX;
+				this.gesture.percent = (this.gesture.currentX - this.gesture.startX) / this.gesture.width;
+
+				this.app._processTransitionFrame(this, 1 - this.gesture.percent);
+				e.preventDefault();
+			}
+		});
+		this.addEventListener("touchend", (e) => {
+			if(this.gesture.started){
+				this.gesture.started = false;
+				var percent = this.gesture.percent;
+
+				if(percent > 0.5 || this.gesture.speed > 5){
+					this.app._animateTransition(this, 400, a => (1-percent) - (1-percent) * a);
+					setTimeout(() => {
+						this.tab.removeChild(this)
+						this.tab._setSelectedPage(this.prevPage);
+					}, 400);
+				}
+				else this.app._animateTransition(this, 400, a => (1-percent) + percent * a);
+			}
+		});
+	}
+}
+
+window.customElements.define('ios-app', IOSApp);
+window.customElements.define('ios-tab', IOSTab);
+window.customElements.define('ios-page', IOSPage);
