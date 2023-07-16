@@ -1,0 +1,119 @@
+ios-top-menu {
+	display: grid;
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	
+	z-index: 3;
+	box-sizing: border-box;
+}
+
+ios-app[standalone] ios-top-menu #statusbar {
+	height: var(--i-inset-top);
+	background: var(--i-statusbar);
+}
+
+ios-top-menu #container {
+	grid-column: 1;
+  	grid-row: 1;
+  	z-index: 2;
+}
+
+ios-top-menu #background {
+	width: 100%;
+	height: 100%;
+
+	grid-column: 1;
+  	grid-row: 1;
+  	z-index: 1;
+
+	border-bottom: 0.333px solid var(--i-separator-menu);
+	transition: opacity 0.1s ease;
+}
+
+ios-top-menu #controls-container {
+	height: 44px;
+	display: flex;
+	align-items: center;
+	font-size: 12pt;
+	margin: 0 7px 0 7px;
+}
+
+ios-top-menu #back-container {
+	display: flex;
+	gap: 5px;
+	color: var(--i-accent);
+	justify-content: flex-start;
+	align-items: center;
+}
+
+ios-top-menu #back-container.active {
+	opacity: 0.5;
+}
+
+ios-top-menu #back-container svg {
+	width: 18px;
+	transform-origin: bottom right;
+}
+
+ios-top-menu #back-container #back-text{
+	font-size: 17px;
+	font-weight: 400;
+	letter-spacing: -0.4px;
+	pointer-events: none;
+}
+
+
+ios-top-menu #title {
+	flex: 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	font-size: 17px;
+	font-weight: 590;
+	color: var(--i-text-1);
+
+	/*transition: opacity 0.2s ease;*/
+}
+
+
+ios-top-menu #tools-container {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+}
+
+/* Animation elements */
+ios-top-menu .title-anim {
+	position: absolute;
+	left: 0;
+	top: 0;
+
+	font-size: 17px;
+	font-weight: 590;
+	color: var(--i-text-1);
+
+	/* height: 44px; */
+	display: flex;
+	align-items: center;
+	pointer-events: none;
+	transform-origin: top left;
+}
+
+ios-top-menu .back-text-anim {
+	position: absolute;
+	left: 0;
+	top: 0;
+
+	font-size: 17px;
+	font-weight: 400;
+	letter-spacing: -0.4px;
+
+	display: flex;
+	align-items: center;
+	pointer-events: none;
+	transform-origin: top left;
+	color: var(--i-accent);
+}

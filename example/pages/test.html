@@ -1,47 +1,101 @@
-<br>
-<list-table>
-	<list-item-button nextPage="pages/test1">
-		Следующая страница
-	</list-item-button>
-</list-table>
-<br>
-<br>
-<list-table>
+<table-view>
+	<table-cell chevron nextPage="pages/test1">
+		Next page
+	</table-cell>
 
-	<list-item>
-		Текст
-	</list-item>
+	<div slot="footer">Here are some example table-view items, such as text, chevron, switch, radio and buttons</div> 
+</table-view>
+<table-view>
+	<div slot="header">Text</div>
+	<div slot="footer">Text is not clickable and used to simply show some information</div>
 
-	<list-item>
-		Текст с иконкой
-		<img slot="left" src="resources/app_store.png">
-	</list-item>
+	<table-cell>
+		Here is some text
+	</table-cell>
+	<table-cell>
+		Apps
+		<div slot="detail">1076</div>
+	</table-cell>
+	<table-cell>
+		AppStore
+		<img slot="icon" src="resources/app_store.png">
+	</table-cell>
+	<table-cell>
+		iMessage
+		<img slot="icon" src="resources/message.png">
+		<div slot="detail">45</div>
+	</table-cell>
+</table-view>
+<table-view>
+	<div slot="header">Chevrons</div>
+	<div slot="footer">Cells with chevron can behave as button, but usually it navigates to another page</div>
 
-	<list-item>
-		Текст со значением
-		<div slot="primary">Test</div>
-	</list-item>
+	<table-cell chevron>
+		My pictures
+	</table-cell>
+	<table-cell chevron>
+		My devices
+		<div slot="detail">5</div>
+	</table-cell>
+	<table-cell chevron>
+		AppStore settings
+		<img slot="icon" src="resources/app_store.png">
+	</table-cell>
+	<table-cell chevron>
+		iMessage settings
+		<img slot="icon" src="resources/message.png">
+		<div slot="detail">24</div>
+	</table-cell>
+</table-view>
+<table-view>
+	<div slot="header">Switches</div>
+	<div slot="footer">Switches are checkboxes, it can be turned on or off. This is all</div>
 
-	<list-item-button>
-		Кнопка
-	</list-item-button>
+	<table-cell switch>
+		Lighting
+	</table-cell>
+	<table-cell switch>
+		Use AppStore
+		<img slot="icon" src="resources/app_store.png">
+	</table-cell>
+</table-view>
+<table-view>
+	<div slot="header">Radio buttons</div>
+	<div slot="footer">Radio buttons are list where can be only one selected item</div>
 
-	<list-item-button>
-		Кнопка со значением
-		<div slot="primary">Test</div>
-	</list-item-button>
+	<table-cell radio group="test_group">
+		Bread
+	</table-cell>
+	<table-cell radio group="test_group" selected>
+		Apple
+	</table-cell>
+	<table-cell radio group="test_group">
+		Cherry
+	</table-cell>
+	<table-cell radio group="test_group">
+		Pineapple
+	</table-cell>
+	<table-cell radio group="test_group">
+		Watermelon
+	</table-cell>
+</table-view>
+<table-view>
+	<div slot="header">Buttons</div>
+	<div slot="footer">Buttons are just buttons</div>
 
-	<list-item-button>
-		Кнопка со значением
-		<div slot="primary">Test</div>
-		<img slot="left" src="resources/message.png">
-	</list-item-button>
+	<table-cell button>
+		Shutdown
+	</table-cell>
+	<table-cell button red>
+		Important button
+	</table-cell>
+	<table-cell button disabled>
+		Not active
+	</table-cell>
+</table-view>
 
-	<list-item-checkbox>
-		Кнопка с checkbox
-	</list-item-checkbox>
-	<list-item-checkbox>
-		Кнопка с checkbox
-	</list-item-checkbox>
-
-</list-table>
+<table-view>
+	<table-cell red centered button>
+		Single button
+	</table-cell>
+</table-view>

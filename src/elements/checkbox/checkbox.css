@@ -1,15 +1,14 @@
 ios-checkbox {
 	position: relative;
-	width: 52px;
-	height: 32px;
-	background: var(--color-text-secondary);
-	-webkit-tap-highlight-color:transparent;
-	border-radius: 9999px;
+	width: 51px;
+	height: 31px;
+	background: var(--i-fill-2);
+	border-radius: 100px;
 	transition: background 0.3s ease;
 }
 
 ios-checkbox.selected {
-	background: var(--color-active);
+	background: var(--i-accent-active);
 }
 
 ios-checkbox::after {
@@ -18,16 +17,17 @@ ios-checkbox::after {
 	left: 2px;
 	top: 2px;
 
-	border-radius: 9999px;
+	border-radius: 100px;
 	background: white;
-	width: 28px;
-	height: 28px;
+	width: 27px;
+	height: 27px;
 	transition: width 0.3s ease, left 0.3s ease, box-shadow 0.3s ease;
+
+	box-shadow: 0px 3px 1px 0px rgba(0, 0, 0, 0.06), 0px 3px 8px 0px rgba(0, 0, 0, 0.15);
 }
 
 ios-checkbox.selected::after {
-	left: calc(100% - 30px);
-	box-shadow: 0 2px 2px rgba(0, 0, 0, 0.24);
+	left: 22px;
 }
 
 ios-checkbox.active::after {
@@ -35,5 +35,5 @@ ios-checkbox.active::after {
 }
 
 ios-checkbox.selected.active::after {
-	left: calc(100% - 35px);
+	left: 16px;
 }

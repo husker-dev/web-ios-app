@@ -1,6 +1,6 @@
 ﻿{
-	"id": "test",
-	"title": "Test",
+	"id": "headers",
+	"title": "Headers",
 	"header": "titled",
 	"dark": true
 }

@@ -25,14 +25,11 @@ class IOSApp extends HTMLElement {
 		var that = this;
 
 		this.innerHTML = `
-			<ios-top-menu></ios-top-menu>
-			<ios-bottom-menu class="blurred"></ios-bottom-menu>
+			<ios-bottom-menu class="i-material-chrome"></ios-bottom-menu>
 		`;
-		this.topMenu = this.querySelector("ios-top-menu");
 		this.bottomMenu = this.querySelector("ios-bottom-menu");
 
 		this.bottomMenu.bindApp(this);
-		this.topMenu.bindApp(this);
 
 		new ResizeObserver(() => {
 			that.getBoundingClientRect().right - that.getBoundingClientRect().left >= 600 ? 
@@ -77,31 +74,37 @@ class IOSApp extends HTMLElement {
 	}
 
 	_animateTransition(page, duration, transform = percent => percent) {
+		let animationId = new IOSAnimationId();
 		var easing = bezier(0.2, 0.8, 0.2, 1);
   		var start = Date.now();
   		var that = this;
-  		this._transitionStarted(page);
+  		this._transitionStarted(animationId, page);
   		(function loop () {
     		var p = (Date.now()-start)/duration;
     		if (p >= 1){
       			that._processTransitionFrame(page, transform(1));
-    			that._transitionCompleted(page, transform(1) == 1);
+    			that._transitionCompleted(animationId, page, transform(1) == 1);
     		}else {
-      			that._processTransitionFrame(page, transform(easing(p)));
+      			that._processTransitionFrame(animationId, page, transform(easing(p)));
       			requestAnimationFrame(loop);
     		}
   		}());
 	}
 
-	_transitionStarted(page){
+	_transitionStarted(animationId, page){
+		this._animationId = animationId;
 		this.dispatchEvent(new CustomEvent("transition-started", { detail: { page: page } }));
 	}
 
-	_transitionCompleted(page, isEnd){
+	_transitionCompleted(animationId, page, isEnd){
+		if(this._animationId != animationId)
+			return;
 		this.dispatchEvent(new CustomEvent("transition-completed", { detail: { page: page, isEnd: isEnd } }));
 	}
 
-	_processTransitionFrame(page, percent){
+	_processTransitionFrame(animationId, page, percent){
+		if(this._animationId != animationId)
+			return;
 		page.style.transform = `translateX(${(1-percent) * 100}%)`;
 		page.prevPage.style.transform = `translateX(${percent * -30}%)`;
 
@@ -112,6 +115,7 @@ class IOSApp extends HTMLElement {
 class IOSTab extends HTMLElement {
 
 	connectedCallback() {
+		this.appendChild(document.createElement("ios-top-menu"))
 		this.dispatchEvent(new CustomEvent("tab-created", { detail: { tab: this } }));
 	}
 
@@ -127,6 +131,8 @@ class IOSTab extends HTMLElement {
 			page.tab = this;
 			page.app = that.app;
 			page.path = pagePath;
+			if(pageManifest.dark !== undefined && pageManifest.dark)
+				page.classList.add("dark-page");
 			
 			// Translate page events to tab
 			page.addEventListener("page-created", e => that.dispatchEvent(new e.constructor(e.type, e)));
@@ -178,9 +184,12 @@ class IOSTab extends HTMLElement {
 class IOSPage extends HTMLElement {
 	connectedCallback() {
 		this.innerHTML = `
-			<div id="page-header"></div>
-			<div id="page-content"></div>
+			<div id="page-scroll">
+				<div id="page-header"></div>
+				<div id="page-content"></div>
+			</div>
 		`;
+		this.scroll = this.querySelector("#page-scroll");
 		this.dispatchEvent(new CustomEvent("page-created", { detail: { page: this } }));
 		this._bindTouchGestures();
 		this._loadContent();
@@ -212,9 +221,10 @@ class IOSPage extends HTMLElement {
 				this.gesture.percent = 0;
 				this.gesture.startX = touchX;
 				this.gesture.width = this.getBoundingClientRect().right - this.getBoundingClientRect().left;
+				this.gesture.animationId = new IOSAnimationId();
 
-				this.app._transitionStarted(this);
-				this.app._processTransitionFrame(this, 1);
+				this.app._transitionStarted(this.gesture.animationId, this);
+				this.app._processTransitionFrame(this.gesture.animationId, this, 1);
 				e.preventDefault();
 			}
 		});
@@ -226,7 +236,7 @@ class IOSPage extends HTMLElement {
 				this.gesture.speed = this.gesture.currentX - this.gesture.previousX;
 				this.gesture.percent = (this.gesture.currentX - this.gesture.startX) / this.gesture.width;
 
-				this.app._processTransitionFrame(this, 1 - this.gesture.percent);
+				this.app._processTransitionFrame(this.gesture.animationId, this, 1 - this.gesture.percent);
 				e.preventDefault();
 			}
 		});
@@ -247,6 +257,8 @@ class IOSPage extends HTMLElement {
 		});
 	}
 }
+
+class IOSAnimationId {}
 
 window.customElements.define('ios-app', IOSApp);
 window.customElements.define('ios-tab', IOSTab);
