@@ -1,0 +1,5 @@
+﻿<template
+	title="Default Titlebar"
+	titlebar="default"
+	src="pages/titlebars/exampleContent.html"
+></template>

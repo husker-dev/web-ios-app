@@ -1,0 +1,10 @@
+i-tab {
+	height: 100%;
+	width: 100%;
+	display: none;
+	position: relative;
+}
+
+i-tab[selected] {
+	display: block;
+}

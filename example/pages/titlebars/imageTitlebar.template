@@ -1,0 +1,6 @@
+﻿<template
+	title="Image Titlebar"
+	titlebar="image"
+	src="pages/titlebars/exampleContent.html"
+	imageSrc="resources/image2.png"
+></template>
