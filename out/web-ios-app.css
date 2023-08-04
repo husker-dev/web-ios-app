@@ -218,7 +218,9 @@ page-shadow page-container {
 page-shadow page-body {
   padding: 0 calc(16px + var(--i-inset-right)) calc(var(--i-bottom-menu-height) + var(--i-inset-bottom)) calc(16px + var(--i-inset-left));
   display: block;
+  /*
   color: var(--i-text-2);
+  */
 }
 
 @media (prefers-color-scheme: light) {
@@ -259,23 +261,26 @@ i-tabbar {
   box-sizing: border-box;
 }
 i-tabbar > i-tabbar-item {
+  height: 50px;
   flex: 1;
-  color: rgb(153, 153, 153);
   display: flex;
-  gap: 7px;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
-  padding: 7px 0 0 0;
+  box-sizing: content-box;
+  padding: -1px 0 3px 0;
+  color: var(--i-text-2);
+}
+i-tabbar > i-tabbar-item > #tab-title {
   font-size: 10px;
-  font-weight: 510;
+  font-weight: 500;
 }
-i-tabbar > i-tabbar-item > svg {
-  width: auto;
-  height: 20px;
-}
-i-tabbar > i-tabbar-item > svg#tabbar-loading-svg {
-  width: 20px;
+i-tabbar > i-tabbar-item > #tab-icon-container {
+  height: 40px;
+  width: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 i-tabbar > i-tabbar-item.selected {
   color: var(--i-accent);
@@ -774,25 +779,33 @@ table-view {
 	padding: 18px 0;
 }
 
-table-view > table-cell {
+table-cell {
 	--border-color: var(--i-separator);
 	background-color: var(--i-bg-2);
 	color: var(--i-text-1);
 }
 
-table-view > table-cell.active {
+table-cell.active {
 	background: var(--i-bg-4);
 }
 
-table-view > table-cell:first-of-type{
+table-cell:first-of-type{
 	border-top-left-radius: 10px;
 	border-top-right-radius: 10px;
 }
 
-table-view > table-cell:last-of-type{
+table-cell:last-of-type{
 	border-bottom-left-radius: 10px;
 	border-bottom-right-radius: 10px;
 	--border-color: transparent;
+}
+
+table-view > *[slot="title"]{
+	font-size: 20px;
+	line-height: 25px;
+	font-weight: 590;
+	letter-spacing: -0.4px;
+	color: var(--i-text-1);
 }
 
 table-view > *[slot="header"]{

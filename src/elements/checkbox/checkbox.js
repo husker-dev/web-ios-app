@@ -17,41 +17,28 @@ class IOSCheckbox extends HTMLElement {
 			this.classList.remove("active");
 			if(!isMoved){
 				this.selected = !this.selected;	
-				if(this.selected)
-					this.classList.add("selected");
-				else
-					this.classList.remove("selected");
+				this.classList.toggle("selected", this.selected);
 			}
 			this.#invokeEvent();
 		});
 		this.addEventListener("touchmove", e => {
 			e.preventDefault();
 			isMoved = true;
-			if(Math.hypot(this.startX - e.changedTouches[0].clientX, this.startY - e.changedTouches[0].clientY) < 100)
-				this.classList.add("active");
-			else
-				this.classList.remove("active");
+			this.classList.toggle("active", 
+				Math.hypot(this.startX - e.changedTouches[0].clientX, this.startY - e.changedTouches[0].clientY) < 100);
 
-			if(e.changedTouches[0].clientX > this.startX){
-				this.selected = true;
-				this.classList.add("selected");
-			}else {
-				this.selected = false;
-				this.classList.remove("selected");
-			}
+			this.selected = e.changedTouches[0].clientX > this.startX;
+			this.classList.toggle("selected", this.selected);
 		});
 		this.addEventListener("click", e => {
 			this.selected = !this.selected;
-			if(this.selected)
-				this.classList.add("selected");
-			else
-				this.classList.remove("selected");
+			this.classList.toggle("selected", this.selected);
 			this.#invokeEvent();
 		});
 	}
 
 	#invokeEvent(){
-		console.log(this.selected);
+		this.dispatchEvent(new CustomEvent("change", { detail: { target: this } }));
 	}
 }
 

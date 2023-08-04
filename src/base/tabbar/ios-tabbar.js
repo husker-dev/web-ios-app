@@ -29,8 +29,10 @@ class IOSTabbar extends HTMLElement {
 class IOSTabbarItem extends HTMLElement {
 	connectedCallback() {
 		this.innerHTML = `
-			<svg id="tabbar-loading-svg"></svg>
-			<div>${this.tab.name}</div>
+			<div id="tab-icon-container">
+				<svg id="tabbar-loading-svg"></svg>
+			</div>
+			<div id="tab-title">${this.tab.name}</div>
 	    `
 
 	    loadSVG(this.tab.icon, src => {

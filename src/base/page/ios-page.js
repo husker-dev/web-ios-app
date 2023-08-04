@@ -40,6 +40,8 @@ class IOSPage extends HTMLElement {
 		this.dispatchEvent(new CustomEvent("page-created", { detail: { page: this } }));
 		if(this.src)
 			this._loadContent();
+		else
+			this._executePageScripts();
 
 		// Workaround to fix mispositioned scroll bar on opened pages
 		setTimeout(() => {this.style.overflow = "hidden"}, 100);
@@ -57,7 +59,22 @@ class IOSPage extends HTMLElement {
 		fetch(this.src).then(d => d.text())
 		.then(content => {
 			this.innerHTML += content;
+			this._executePageScripts();
 		});
+	}
+
+	_executePageScripts(){
+		Array.from(this.querySelectorAll("script")).forEach(oldScriptEl => {
+			const newScriptEl = document.createElement("script");
+	      
+			Array.from(oldScriptEl.attributes).forEach( attr => {
+				newScriptEl.setAttribute(attr.name, attr.value)
+			});
+	      
+			const scriptText = document.createTextNode(oldScriptEl.innerHTML);
+			newScriptEl.appendChild(scriptText);
+	      	oldScriptEl.parentNode.replaceChild(newScriptEl, oldScriptEl);
+	  });
 	}
 
 	_bindTouchGestures(){

@@ -319,6 +319,8 @@ class IOSPage extends HTMLElement {
 		this.dispatchEvent(new CustomEvent("page-created", { detail: { page: this } }));
 		if(this.src)
 			this._loadContent();
+		else
+			this._executePageScripts();
 
 		// Workaround to fix mispositioned scroll bar on opened pages
 		setTimeout(() => {this.style.overflow = "hidden"}, 100);
@@ -336,7 +338,22 @@ class IOSPage extends HTMLElement {
 		fetch(this.src).then(d => d.text())
 		.then(content => {
 			this.innerHTML += content;
+			this._executePageScripts();
 		});
+	}
+
+	_executePageScripts(){
+		Array.from(this.querySelectorAll("script")).forEach(oldScriptEl => {
+			const newScriptEl = document.createElement("script");
+	      
+			Array.from(oldScriptEl.attributes).forEach( attr => {
+				newScriptEl.setAttribute(attr.name, attr.value)
+			});
+	      
+			const scriptText = document.createTextNode(oldScriptEl.innerHTML);
+			newScriptEl.appendChild(scriptText);
+	      	oldScriptEl.parentNode.replaceChild(newScriptEl, oldScriptEl);
+	  });
 	}
 
 	_bindTouchGestures(){
@@ -389,7 +406,7 @@ class IOSPage extends HTMLElement {
 window.customElements.define('i-page', IOSPage);
 class IOSTab extends HTMLElement {
 
-	static svgTemplate = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 28"><path fill="currentColor" d="M13 15.7c.5 0 1-.1 1.6-.5l9.1-5.3c1-.5 1.4-1 1.4-1.8 0-.7-.4-1.2-1.4-1.8L14.6 1C14 .7 13.5.5 13 .5s-1 .2-1.6.5L2.3 6.3C1.3 7 .9 7.3.9 8.1s.4 1.3 1.4 1.8l9.1 5.3c.6.4 1.1.5 1.6.5Zm0 5.9c.5 0 .9-.3 1.4-.6l9.9-5.8c.5-.3.8-.8.8-1.3 0-.6-.3-1-.7-1.3l-10.7 6.2-.7.3-.7-.3-10.7-6.2c-.4.3-.7.7-.7 1.3 0 .5.3 1 .8 1.3l9.9 5.8c.5.3 1 .6 1.4.6Zm0 5.4c.5 0 .9-.2 1.4-.5l9.9-5.8c.5-.4.8-.8.8-1.3 0-.6-.3-1-.7-1.3l-10.7 6.2-.7.3-.7-.3-10.7-6.2c-.4.3-.7.7-.7 1.3 0 .5.3 1 .8 1.3l9.9 5.8c.5.3 1 .5 1.4.5Z"/></svg>`;
+	static svgTemplate = `<svg width="26" height="28" viewBox="0 0 26 28" xmlns="http://www.w3.org/2000/svg"><path d="m13.118 14.831c0.433 0 1.257-0.024 1.795-0.344l9.151-4.057c0.869-0.59 1.051-1.255 1.067-1.773 0.02-0.662-0.313-1.634-1.181-2.15l-8.515-3.921c-0.537-0.309-2.096-0.552-2.529-0.552-0.444 0-1.958 0.42-2.496 0.73l-8.643 4.034c-0.85 0.602-1.022 1.284-0.951 1.942 0.098 0.887 0.206 0.857 0.889 1.503l9.577 4.212c0.537 0.32 1.391 0.376 1.836 0.376zm-0.12 5.467c0.403 0 1.443-0.068 1.928-0.345l8.858-3.991c0.497-0.3 1.448-1.117 1.382-1.952-0.091-1.138-0.598-1.7-0.948-1.906l-9.22 3.888c-0.454 0.261-1.417 0.478-1.916 0.478-0.542 0-1.539-0.228-1.766-0.362l-9.395-4.012c-0.462 0.022-1.174 0.911-1.201 1.642-0.03 0.761 0.7 1.62 1.135 1.839l9.408 4.384c0.485 0.278 1.322 0.337 1.735 0.337zm0.09 5.344c0.403 0 1.296-0.053 1.781-0.342l9.147-4.299c0.485-0.289 1.129-0.789 1.053-1.879-0.056-0.794-0.071-1.123-0.918-1.765l-9.203 4.113c-0.228 0.134-0.948 0.39-1.853 0.39-0.939 0-1.603-0.224-1.831-0.359l-9.451-4.017c-0.979 0.247-1.005 1.45-1.005 1.947 0 0.455 0.403 1.279 0.9 1.568l9.465 4.262c0.486 0.29 1.502 0.381 1.915 0.381z" fill="currentColor"/></svg>`;
 	static tabCounter = 0;
 
 	_bindApp(app){
@@ -419,10 +436,9 @@ class IOSTab extends HTMLElement {
 				element.prevPage = this.selectedPage;
 				element._bindTab(this);
 
-				if(element.prevPage !== undefined){
+				if(element.prevPage !== undefined)
 					this.app._animateTransition(element, 600);
-					setTimeout(() => this._setSelectedPage(element), 600);
-				} else this._setSelectedPage(element);
+				this._setSelectedPage(element);
 			}
 		}))).observe(this, {childList: true});
 
@@ -519,8 +535,10 @@ class IOSTabbar extends HTMLElement {
 class IOSTabbarItem extends HTMLElement {
 	connectedCallback() {
 		this.innerHTML = `
-			<svg id="tabbar-loading-svg"></svg>
-			<div>${this.tab.name}</div>
+			<div id="tab-icon-container">
+				<svg id="tabbar-loading-svg"></svg>
+			</div>
+			<div id="tab-title">${this.tab.name}</div>
 	    `
 
 	    loadSVG(this.tab.icon, src => {
@@ -1113,41 +1131,28 @@ class IOSCheckbox extends HTMLElement {
 			this.classList.remove("active");
 			if(!isMoved){
 				this.selected = !this.selected;	
-				if(this.selected)
-					this.classList.add("selected");
-				else
-					this.classList.remove("selected");
+				this.classList.toggle("selected", this.selected);
 			}
 			this.#invokeEvent();
 		});
 		this.addEventListener("touchmove", e => {
 			e.preventDefault();
 			isMoved = true;
-			if(Math.hypot(this.startX - e.changedTouches[0].clientX, this.startY - e.changedTouches[0].clientY) < 100)
-				this.classList.add("active");
-			else
-				this.classList.remove("active");
+			this.classList.toggle("active", 
+				Math.hypot(this.startX - e.changedTouches[0].clientX, this.startY - e.changedTouches[0].clientY) < 100);
 
-			if(e.changedTouches[0].clientX > this.startX){
-				this.selected = true;
-				this.classList.add("selected");
-			}else {
-				this.selected = false;
-				this.classList.remove("selected");
-			}
+			this.selected = e.changedTouches[0].clientX > this.startX;
+			this.classList.toggle("selected", this.selected);
 		});
 		this.addEventListener("click", e => {
 			this.selected = !this.selected;
-			if(this.selected)
-				this.classList.add("selected");
-			else
-				this.classList.remove("selected");
+			this.classList.toggle("selected", this.selected);
 			this.#invokeEvent();
 		});
 	}
 
 	#invokeEvent(){
-		console.log(this.selected);
+		this.dispatchEvent(new CustomEvent("change", { detail: { target: this } }));
 	}
 }
 
@@ -1213,18 +1218,98 @@ class TableView extends HTMLElement {
 		this.attachShadow({mode: 'open'});
 	    this.shadowRoot.innerHTML = `
 	    	<style>
-	    		slot[name=header] {
-	    			
+	    		#title {
+	    			display: none;
+	    			height: 30px;
+	    			padding: 0 16px 5px 19px;
+	    			z-index: 10;
 	    		}
-	    		slot[name=footer] {
 
+	    		.collapsable #title {
+	    			display: flex;
+	    		}
+
+	    		#title-text{
+	    			flex: 1;
+	    		}
+
+	    		#title-icon{
+	    			color: var(--i-accent);
+	    			display: flex;
+	    			align-items: center;
+	    			rotate: 90deg;
+	    			transition: rotate 0.3s ease;
+	    		}
+
+	    		.collapsed #title-icon{
+	    			rotate: 0deg;
+	    		}
+
+	    		#content-wrapper {
+	    			overflow: hidden;
+	    		}
+
+	    		#content {
+	    			display: grid;
+	    			max-height: var(--full-height);
+	    			translate: 0 0;
+	    			transition: max-height 0.4s ease, translate 0.4s ease;
+	    		}
+	    		.collapsed #content {
+	    			translate: 0 calc(0px - var(--full-height));
+	    			max-height: 0px;
 	    		}
 	    	</style>
-
-	    	<slot name="header"></slot>
-	    	<slot id="content-slot"></slot>
-	    	<slot name="footer"></slot>
+	    	<table-view-shadow>
+		    	<div id="title">
+		    		<div id="title-text">
+		    			<slot name="title"></slot>
+		    		</div>
+		    		<div id="title-icon">
+		    			<svg width="8" height="12" viewBox="0 0 8 12" xmlns="http://www.w3.org/2000/svg">
+							<path d="M7.5166 6.00684C7.5166 6.15072 7.48893 6.28353 7.43359 6.40527C7.37826 6.52702 7.29248 6.646 7.17627 6.76221L2.2041 11.6846C2.02148 11.8672 1.80013 11.9585 1.54004 11.9585C1.26888 11.9585 1.03923 11.8672 0.851074 11.6846C0.662923 11.4964 0.568848 11.2695 0.568848 11.0039C0.568848 10.7383 0.671224 10.5031 0.875977 10.2983L5.23389 6.00684L0.875977 1.71533C0.671224 1.51058 0.568848 1.27539 0.568848 1.00977C0.568848 0.744141 0.662923 0.52002 0.851074 0.337402C1.03923 0.149251 1.26888 0.0551758 1.54004 0.0551758C1.80013 0.0551758 2.02148 0.146484 2.2041 0.329102L7.17627 5.25146C7.40316 5.46729 7.5166 5.71908 7.5166 6.00684Z" fill="currentColor"/>
+						</svg>
+		    		</div>
+		    	</div>
+		    	<div id="content-wrapper">
+		    		<div id="content">
+		    			<slot name="header"></slot>
+				    	<slot id="content-slot"></slot>
+				    	<slot name="footer"></slot>
+		    		</div>
+		    	</div>
+	    	</table-view-shadow>
 	    `;
+	    this.titleSlot = this.shadowRoot.querySelector(`slot[name="title"]`);
+	    this.titleElement = this.shadowRoot.querySelector(`#title`);
+	    this.shadowElement = this.shadowRoot.querySelector(`table-view-shadow`);
+	    this.titleSlot.addEventListener("slotchange", e => {
+	    	this.shadowElement.classList.toggle("collapsable", this.titleSlot.assignedNodes().length > 0);
+	    });
+
+	    this.titleElement.addEventListener("click", e => {
+	    	const collapsed = this.shadowElement.classList.contains("collapsed");
+	    	this.shadowElement.style.setProperty("--full-height", this.shadowRoot.querySelector(`#content`).scrollHeight + "px");
+	    	setTimeout(() => {
+	    		this.shadowElement.classList.toggle("collapsed", !collapsed);
+	    	}, 1);
+	    });
+
+	    this.shadowRoot.querySelector(`#content`).addEventListener("transitionend", (event) => {
+	    	if(!this.shadowElement.classList.contains("collapsed"))
+	    	this.shadowElement.style.removeProperty("--full-height");
+	    });
+	}
+
+	animate(duration, draw, start = performance.now()) {
+		const that = this;
+		this.animationId = this.animationId || 0;
+		const currentAnimId = ++this.animationId;
+		requestAnimationFrame(function animate(time) {
+			let timeFraction = Math.min((time - start) / duration, 1);
+			draw(timeFraction);
+			if (timeFraction < 1 && currentAnimId == that.animationId) requestAnimationFrame(animate);
+  		});
 	}
 }
 
@@ -1344,6 +1429,7 @@ class RadioCellDecorator {
 			RadioCellDecorator.groups[cell.groupName]?.shadowItem.classList.remove("selected");
 			RadioCellDecorator.groups[cell.groupName] = cell;
 			cell.shadowItem.classList.add("selected");
+			cell.dispatchEvent(new CustomEvent("change", { detail: { target: cell } }));
 		};
 
 		cell.groupName = cell.getAttribute("group");

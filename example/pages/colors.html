@@ -1,0 +1,65 @@
+The application has several accent colors. You can select them dynamically.
+
+<style>
+	.color-container div[slot="icon"] {
+		border-radius: 100px;
+		width: 18px;
+		height: 18px;
+		border: solid 1.5px rgba(0, 0, 0, 0.1);
+	}
+</style>
+<script>
+	function addPallete(title, variable){
+		const pallete = {
+			"Default": "--i-text-1",
+			"Red": "--i-red",
+			"Orange": "--i-orange",
+			"Yellow": "--i-yellow",
+			"Green": "--i-green",
+			"Mint": "--i-mint",
+			"Teal": "--i-teal",
+			"Cyan": "--i-cyan",
+			"Blue": "--i-blue",
+			"Indigo": "--i-indigo",
+			"Purple": "--i-purple",
+			"Pink": "--i-pink",
+			"Brown": "--i-brown"
+		};
+
+		const app = document.querySelector("i-app");
+		const variableValue = getComputedStyle(app).getPropertyValue(variable);
+		const table = document.createElement("table-view");
+		table.innerHTML = `<div slot="header">${title}</div>`;
+		table.classList.add("color-container");
+
+		for(colorName in pallete){
+			const value = pallete[colorName];
+			const cell = document.createElement("table-cell");
+			cell.setAttribute("radio", "");
+			cell.setAttribute("group", variable);
+			cell.innerHTML = `<div slot="icon" style="background: var(${value});"></div>${colorName}`;
+			if(variableValue == getComputedStyle(app).getPropertyValue(value))
+				cell.setAttribute("selected", "");
+
+			cell.addEventListener("change", e => app.style.setProperty(variable, `var(${value})`));
+			table.appendChild(cell);
+		}
+
+		document.querySelector("i-app i-tab[selected]").selectedPage.appendChild(table);
+	}
+
+	addPallete("Accent", "--i-accent");
+	addPallete("Active accent", "--i-accent-active");
+</script>
+
+<table-view>
+	<div slot="header">example</div>
+	<table-cell switch>
+		<div slot="icon" style="color: var(--i-accent)">
+			<svg width="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+			<path d="M8.79346 17.4736C13.4253 17.4736 17.2603 13.6304 17.2603 9.00684C17.2603 4.375 13.417 0.540039 8.78516 0.540039C4.16162 0.540039 0.32666 4.375 0.32666 9.00684C0.32666 13.6304 4.16992 17.4736 8.79346 17.4736ZM8.79346 16.0625C4.87549 16.0625 1.74609 12.9248 1.74609 9.00684C1.74609 5.08887 4.86719 1.95117 8.78516 1.95117C12.7031 1.95117 15.8491 5.08887 15.8491 9.00684C15.8491 12.9248 12.7114 16.0625 8.79346 16.0625ZM4.91699 10.2104C5.58105 10.2104 6.12061 9.6709 6.12061 8.99854C6.12061 8.33447 5.57275 7.79492 4.91699 7.79492C4.24463 7.79492 3.70508 8.33447 3.70508 8.99854C3.70508 9.6709 4.24463 10.2104 4.91699 10.2104ZM8.78516 10.2104C9.44922 10.2104 9.99707 9.6709 9.99707 8.99854C9.99707 8.33447 9.44922 7.79492 8.78516 7.79492C8.12109 7.79492 7.57324 8.33447 7.57324 8.99854C7.57324 9.6709 8.12109 10.2104 8.78516 10.2104ZM12.6616 10.2104C13.3257 10.2104 13.8652 9.6709 13.8652 8.99854C13.8652 8.33447 13.3257 7.79492 12.6616 7.79492C11.9893 7.79492 11.4497 8.33447 11.4497 8.99854C11.4497 9.6709 11.9893 10.2104 12.6616 10.2104Z" fill="currentColor"/>
+		</svg>
+		</div>
+		Example
+	</table-cell>
+</table-view>

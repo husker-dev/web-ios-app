@@ -6,25 +6,33 @@ table-view {
 	padding: 18px 0;
 }
 
-table-view > table-cell {
+table-cell {
 	--border-color: var(--i-separator);
 	background-color: var(--i-bg-2);
 	color: var(--i-text-1);
 }
 
-table-view > table-cell.active {
+table-cell.active {
 	background: var(--i-bg-4);
 }
 
-table-view > table-cell:first-of-type{
+table-cell:first-of-type{
 	border-top-left-radius: 10px;
 	border-top-right-radius: 10px;
 }
 
-table-view > table-cell:last-of-type{
+table-cell:last-of-type{
 	border-bottom-left-radius: 10px;
 	border-bottom-right-radius: 10px;
 	--border-color: transparent;
+}
+
+table-view > *[slot="title"]{
+	font-size: 20px;
+	line-height: 25px;
+	font-weight: 590;
+	letter-spacing: -0.4px;
+	color: var(--i-text-1);
 }
 
 table-view > *[slot="header"]{

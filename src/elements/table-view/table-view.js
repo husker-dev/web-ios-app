@@ -4,18 +4,98 @@ class TableView extends HTMLElement {
 		this.attachShadow({mode: 'open'});
 	    this.shadowRoot.innerHTML = `
 	    	<style>
-	    		slot[name=header] {
-	    			
+	    		#title {
+	    			display: none;
+	    			height: 30px;
+	    			padding: 0 16px 5px 19px;
+	    			z-index: 10;
 	    		}
-	    		slot[name=footer] {
 
+	    		.collapsable #title {
+	    			display: flex;
+	    		}
+
+	    		#title-text{
+	    			flex: 1;
+	    		}
+
+	    		#title-icon{
+	    			color: var(--i-accent);
+	    			display: flex;
+	    			align-items: center;
+	    			rotate: 90deg;
+	    			transition: rotate 0.3s ease;
+	    		}
+
+	    		.collapsed #title-icon{
+	    			rotate: 0deg;
+	    		}
+
+	    		#content-wrapper {
+	    			overflow: hidden;
+	    		}
+
+	    		#content {
+	    			display: grid;
+	    			max-height: var(--full-height);
+	    			translate: 0 0;
+	    			transition: max-height 0.4s ease, translate 0.4s ease;
+	    		}
+	    		.collapsed #content {
+	    			translate: 0 calc(0px - var(--full-height));
+	    			max-height: 0px;
 	    		}
 	    	</style>
-
-	    	<slot name="header"></slot>
-	    	<slot id="content-slot"></slot>
-	    	<slot name="footer"></slot>
+	    	<table-view-shadow>
+		    	<div id="title">
+		    		<div id="title-text">
+		    			<slot name="title"></slot>
+		    		</div>
+		    		<div id="title-icon">
+		    			<svg width="8" height="12" viewBox="0 0 8 12" xmlns="http://www.w3.org/2000/svg">
+							<path d="M7.5166 6.00684C7.5166 6.15072 7.48893 6.28353 7.43359 6.40527C7.37826 6.52702 7.29248 6.646 7.17627 6.76221L2.2041 11.6846C2.02148 11.8672 1.80013 11.9585 1.54004 11.9585C1.26888 11.9585 1.03923 11.8672 0.851074 11.6846C0.662923 11.4964 0.568848 11.2695 0.568848 11.0039C0.568848 10.7383 0.671224 10.5031 0.875977 10.2983L5.23389 6.00684L0.875977 1.71533C0.671224 1.51058 0.568848 1.27539 0.568848 1.00977C0.568848 0.744141 0.662923 0.52002 0.851074 0.337402C1.03923 0.149251 1.26888 0.0551758 1.54004 0.0551758C1.80013 0.0551758 2.02148 0.146484 2.2041 0.329102L7.17627 5.25146C7.40316 5.46729 7.5166 5.71908 7.5166 6.00684Z" fill="currentColor"/>
+						</svg>
+		    		</div>
+		    	</div>
+		    	<div id="content-wrapper">
+		    		<div id="content">
+		    			<slot name="header"></slot>
+				    	<slot id="content-slot"></slot>
+				    	<slot name="footer"></slot>
+		    		</div>
+		    	</div>
+	    	</table-view-shadow>
 	    `;
+	    this.titleSlot = this.shadowRoot.querySelector(`slot[name="title"]`);
+	    this.titleElement = this.shadowRoot.querySelector(`#title`);
+	    this.shadowElement = this.shadowRoot.querySelector(`table-view-shadow`);
+	    this.titleSlot.addEventListener("slotchange", e => {
+	    	this.shadowElement.classList.toggle("collapsable", this.titleSlot.assignedNodes().length > 0);
+	    });
+
+	    this.titleElement.addEventListener("click", e => {
+	    	const collapsed = this.shadowElement.classList.contains("collapsed");
+	    	this.shadowElement.style.setProperty("--full-height", this.shadowRoot.querySelector(`#content`).scrollHeight + "px");
+	    	setTimeout(() => {
+	    		this.shadowElement.classList.toggle("collapsed", !collapsed);
+	    	}, 1);
+	    });
+
+	    this.shadowRoot.querySelector(`#content`).addEventListener("transitionend", (event) => {
+	    	if(!this.shadowElement.classList.contains("collapsed"))
+	    	this.shadowElement.style.removeProperty("--full-height");
+	    });
+	}
+
+	animate(duration, draw, start = performance.now()) {
+		const that = this;
+		this.animationId = this.animationId || 0;
+		const currentAnimId = ++this.animationId;
+		requestAnimationFrame(function animate(time) {
+			let timeFraction = Math.min((time - start) / duration, 1);
+			draw(timeFraction);
+			if (timeFraction < 1 && currentAnimId == that.animationId) requestAnimationFrame(animate);
+  		});
 	}
 }
 
@@ -135,6 +215,7 @@ class RadioCellDecorator {
 			RadioCellDecorator.groups[cell.groupName]?.shadowItem.classList.remove("selected");
 			RadioCellDecorator.groups[cell.groupName] = cell;
 			cell.shadowItem.classList.add("selected");
+			cell.dispatchEvent(new CustomEvent("change", { detail: { target: cell } }));
 		};
 
 		cell.groupName = cell.getAttribute("group");

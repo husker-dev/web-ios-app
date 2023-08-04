@@ -1,0 +1,5 @@
+<template
+	title="Colors"
+	titlebar="titled"
+	inverted="true"
+></template>

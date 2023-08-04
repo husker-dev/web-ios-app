@@ -26,9 +26,11 @@
 		<link rel="stylesheet" href="../out/web-ios-app.css" onload="IOSApp.notifyCSS()">
 
 		<script>
+			/*
 			if ('serviceWorker' in navigator) 
 				navigator.serviceWorker.register('sw.js');
 			else fetch("/error")
+			*/
 		</script>
 		<title>Web IOS App</title>
 	</head>
@@ -36,12 +38,21 @@
 	<body>
 		<i-app standalone>
 			<i-tab selected name="Overview" pagePath="overview">
-				<template path="overview" title="Overview" titlebar="titled">
+				<template path="overview" title="Overview" titlebar="titled" inverted="true">
 					Here you can see all possible UI controls
 					<table-view>
-						<table-cell chevron nextPage="pages/tableview">Tableview</table-cell>
+						<div slot="header">Appearance</div>
+						<table-cell chevron nextPage="pages/colors">Colors</table-cell>
+					</table-view>
+					<table-view>
+						<div slot="header">Page</div>
 						<table-cell chevron nextPage="pages/titlebars">Titlebar</table-cell>
 						<table-cell chevron nextPage="pages/toolbar">Toolbar</table-cell>
+					</table-view>
+					<table-view>
+						<div slot="header">Elements</div>
+						<table-cell chevron nextPage="pages/tableview">Tableview</table-cell>
+						
 					</table-view>
 				</template>
 			</i-tab>
