@@ -11,6 +11,8 @@ const contentToCache = [
 	"pages/titlebars.template",
 	"pages/toolbar.html",
 	"pages/toolbar.template",
+	"pages/colors.html",
+	"pages/colors.template",
 
 	"pages/titlebars/exampleContent.html",
 	"pages/titlebars/defaultTitlebar.template",
