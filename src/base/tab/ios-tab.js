@@ -16,7 +16,7 @@ class IOSTab extends HTMLElement {
 		]);
 
 		this.attachShadow({mode: 'open'});
-		this.app.addStyleToShadow(this.shadowRoot);
+		IOSApp.addStyleToShadow(this.shadowRoot);
 		this.shadowRoot.innerHTML += `
 			<i-titlebar-root></i-titlebar-root>
 			<slot></slot>

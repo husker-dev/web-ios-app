@@ -1,0 +1,128 @@
+table-view {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	box-sizing: border-box;
+	padding: 18px 0;
+}
+
+table-view-shadow {
+	#title {
+		display: none;
+		height: 30px;
+		padding: 0 16px 5px 19px;
+		z-index: 10;
+	}
+
+	&.collapsable #title {
+		display: flex;
+	}
+
+	#title-text {
+		flex: 1;
+	}
+
+	#title-icon {
+		color: var(--i-accent);
+		display: flex;
+		align-items: center;
+		rotate: 90deg;
+		transition: rotate 0.3s ease;
+	}
+
+	#content-wrapper {
+		overflow: hidden;
+	}
+
+	#content {
+		display: grid;
+		max-height: var(--full-height);
+		translate: 0 0;
+		transition: max-height 0.4s ease, translate 0.4s ease;
+	}
+
+	&.collapsed {
+		#title-icon{
+			rotate: 0deg;
+		}
+
+		#content {
+			translate: 0 calc(0px - var(--full-height));
+			max-height: 0px;
+		}
+	}
+}
+
+table-cell {
+	--border-color: var(--i-separator);
+	background-color: var(--i-bg-2);
+	color: var(--i-text-1);
+}
+
+table-cell.active {
+	background: var(--i-bg-4);
+}
+
+table-cell:first-of-type{
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+}
+
+table-cell:last-of-type{
+	border-bottom-left-radius: 10px;
+	border-bottom-right-radius: 10px;
+	--border-color: transparent;
+}
+
+table-view > *[slot="title"]{
+	font-size: 20px;
+	line-height: 25px;
+	font-weight: 590;
+	letter-spacing: -0.4px;
+	color: var(--i-text-1);
+}
+
+table-view > *[slot="header"]{
+	padding: 0 16px 7px 16px;
+	font-weight: 400;
+	font-size: 13px;
+	line-height: 16px;
+	text-transform: uppercase;
+	color: var(--i-text-2);
+}
+
+table-view > *[slot="footer"]{
+	padding: 5px 16px 0 16px;
+	font-weight: 400;
+	font-size: 13px;
+	line-height: 16px;
+	color: var(--i-text-2);
+}
+
+table-view > table-cell *[slot="icon"]{
+	margin-right: 16px;
+}
+
+table-view > table-cell img[slot="icon"]{
+	height: 29px;
+	width: 29px;
+}
+
+/* Button style */
+table-view > table-cell[button]{
+	color: var(--i-accent);
+}
+
+table-view > table-cell[button][centered]{
+	--justify-content: center;
+	--gap: 0;
+}
+
+table-view > table-cell[button][red]{
+	color: var(--i-red);
+}
+
+table-view > table-cell[button][disabled]{
+	color: var(--i-grey-2);
+	pointer-events: none;
+}

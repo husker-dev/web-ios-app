@@ -13,7 +13,7 @@ class IOSPage extends HTMLElement {
 			this.classList.add("inverted");
 
 		this.attachShadow({mode: 'open'});
-		this.app.addStyleToShadow(this.shadowRoot);
+		IOSApp.addStyleToShadow(this.shadowRoot);
 	    this.shadowRoot.innerHTML += `
 	    	<page-shadow>
 	    		<i-titlebar-${this.titlebarType}></i-titlebar-${this.titlebarType}>

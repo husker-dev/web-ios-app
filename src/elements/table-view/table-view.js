@@ -2,50 +2,8 @@
 class TableView extends HTMLElement {
 	connectedCallback() {
 		this.attachShadow({mode: 'open'});
-	    this.shadowRoot.innerHTML = `
-	    	<style>
-	    		#title {
-	    			display: none;
-	    			height: 30px;
-	    			padding: 0 16px 5px 19px;
-	    			z-index: 10;
-	    		}
-
-	    		.collapsable #title {
-	    			display: flex;
-	    		}
-
-	    		#title-text{
-	    			flex: 1;
-	    		}
-
-	    		#title-icon{
-	    			color: var(--i-accent);
-	    			display: flex;
-	    			align-items: center;
-	    			rotate: 90deg;
-	    			transition: rotate 0.3s ease;
-	    		}
-
-	    		.collapsed #title-icon{
-	    			rotate: 0deg;
-	    		}
-
-	    		#content-wrapper {
-	    			overflow: hidden;
-	    		}
-
-	    		#content {
-	    			display: grid;
-	    			max-height: var(--full-height);
-	    			translate: 0 0;
-	    			transition: max-height 0.4s ease, translate 0.4s ease;
-	    		}
-	    		.collapsed #content {
-	    			translate: 0 calc(0px - var(--full-height));
-	    			max-height: 0px;
-	    		}
-	    	</style>
+		IOSApp.addStyleToShadow(this.shadowRoot);
+	    this.shadowRoot.innerHTML += `
 	    	<table-view-shadow>
 		    	<div id="title">
 		    		<div id="title-text">

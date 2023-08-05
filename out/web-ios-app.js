@@ -44,33 +44,39 @@ class IOSApp extends HTMLElement {
 		const realCSS = [...document.styleSheets].find(style => 
 			[...style.cssRules].find(rule => rule.cssText.includes("i-app-detection-label"))
 		);
-		IOSApp.css = new CSSStyleSheet();
-		IOSApp.css.replace([...realCSS.cssRules].map(rule => rule.cssText).join("\n"));
+		if(document.adoptedStyleSheets){
+			IOSApp.css = new CSSStyleSheet();
+			IOSApp.css.replace([...realCSS.cssRules].map(rule => rule.cssText).join("\n"));
+		}else 
+			IOSApp.css = [...realCSS.cssRules].map(rule => rule.cssText).join("\n");
 
 		const callbacks = IOSApp._cssCallbacks;
 		IOSApp._cssCallbacks = undefined;
 		callbacks.forEach(a => a())
 	}
 
-	loadStyleSheet(callback){
+	static loadStyleSheet(callback){
 		if(IOSApp._cssCallbacks) IOSApp._cssCallbacks.push(callback);
 		else callback();
 	}
 
-	addStyleToShadow(shadow){
-		const newStyleSheets = [IOSApp.css];
-		for (let i = 0; i < shadow.adoptedStyleSheets.length; i++)
-		    newStyleSheets.push(shadow.adoptedStyleSheets[i]);
-		shadow.adoptedStyleSheets = newStyleSheets;
+	static addStyleToShadow(shadow){
+		if(document.adoptedStyleSheets){
+			const newStyleSheets = [IOSApp.css];
+			for (let i = 0; i < shadow.adoptedStyleSheets.length; i++)
+			    newStyleSheets.push(shadow.adoptedStyleSheets[i]);
+			shadow.adoptedStyleSheets = newStyleSheets;
+		}else
+			shadow.innerHTML += `<style>${IOSApp.css}</style>`;
 	}
 
 	connectedCallback() {
 		if(!this.initialized) this.initialized = true;
 		else return;
 
-		this.loadStyleSheet(() => {
+		IOSApp.loadStyleSheet(() => {
 			this.attachShadow({mode: 'open'});
-			this.addStyleToShadow(this.shadowRoot);
+			IOSApp.addStyleToShadow(this.shadowRoot);
 			this.shadowRoot.innerHTML += `
 				<i-tabbar></i-tabbar>
 				<slot></slot>
@@ -292,7 +298,7 @@ class IOSPage extends HTMLElement {
 			this.classList.add("inverted");
 
 		this.attachShadow({mode: 'open'});
-		this.app.addStyleToShadow(this.shadowRoot);
+		IOSApp.addStyleToShadow(this.shadowRoot);
 	    this.shadowRoot.innerHTML += `
 	    	<page-shadow>
 	    		<i-titlebar-${this.titlebarType}></i-titlebar-${this.titlebarType}>
@@ -422,7 +428,7 @@ class IOSTab extends HTMLElement {
 		]);
 
 		this.attachShadow({mode: 'open'});
-		this.app.addStyleToShadow(this.shadowRoot);
+		IOSApp.addStyleToShadow(this.shadowRoot);
 		this.shadowRoot.innerHTML += `
 			<i-titlebar-root></i-titlebar-root>
 			<slot></slot>
@@ -1216,50 +1222,8 @@ window.customElements.define('search-box', SearchBox);
 class TableView extends HTMLElement {
 	connectedCallback() {
 		this.attachShadow({mode: 'open'});
-	    this.shadowRoot.innerHTML = `
-	    	<style>
-	    		#title {
-	    			display: none;
-	    			height: 30px;
-	    			padding: 0 16px 5px 19px;
-	    			z-index: 10;
-	    		}
-
-	    		.collapsable #title {
-	    			display: flex;
-	    		}
-
-	    		#title-text{
-	    			flex: 1;
-	    		}
-
-	    		#title-icon{
-	    			color: var(--i-accent);
-	    			display: flex;
-	    			align-items: center;
-	    			rotate: 90deg;
-	    			transition: rotate 0.3s ease;
-	    		}
-
-	    		.collapsed #title-icon{
-	    			rotate: 0deg;
-	    		}
-
-	    		#content-wrapper {
-	    			overflow: hidden;
-	    		}
-
-	    		#content {
-	    			display: grid;
-	    			max-height: var(--full-height);
-	    			translate: 0 0;
-	    			transition: max-height 0.4s ease, translate 0.4s ease;
-	    		}
-	    		.collapsed #content {
-	    			translate: 0 calc(0px - var(--full-height));
-	    			max-height: 0px;
-	    		}
-	    	</style>
+		IOSApp.addStyleToShadow(this.shadowRoot);
+	    this.shadowRoot.innerHTML += `
 	    	<table-view-shadow>
 		    	<div id="title">
 		    		<div id="title-text">

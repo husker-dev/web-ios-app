@@ -44,33 +44,39 @@ class IOSApp extends HTMLElement {
 		const realCSS = [...document.styleSheets].find(style => 
 			[...style.cssRules].find(rule => rule.cssText.includes("i-app-detection-label"))
 		);
-		IOSApp.css = new CSSStyleSheet();
-		IOSApp.css.replace([...realCSS.cssRules].map(rule => rule.cssText).join("\n"));
+		if(document.adoptedStyleSheets){
+			IOSApp.css = new CSSStyleSheet();
+			IOSApp.css.replace([...realCSS.cssRules].map(rule => rule.cssText).join("\n"));
+		}else 
+			IOSApp.css = [...realCSS.cssRules].map(rule => rule.cssText).join("\n");
 
 		const callbacks = IOSApp._cssCallbacks;
 		IOSApp._cssCallbacks = undefined;
 		callbacks.forEach(a => a())
 	}
 
-	loadStyleSheet(callback){
+	static loadStyleSheet(callback){
 		if(IOSApp._cssCallbacks) IOSApp._cssCallbacks.push(callback);
 		else callback();
 	}
 
-	addStyleToShadow(shadow){
-		const newStyleSheets = [IOSApp.css];
-		for (let i = 0; i < shadow.adoptedStyleSheets.length; i++)
-		    newStyleSheets.push(shadow.adoptedStyleSheets[i]);
-		shadow.adoptedStyleSheets = newStyleSheets;
+	static addStyleToShadow(shadow){
+		if(document.adoptedStyleSheets){
+			const newStyleSheets = [IOSApp.css];
+			for (let i = 0; i < shadow.adoptedStyleSheets.length; i++)
+			    newStyleSheets.push(shadow.adoptedStyleSheets[i]);
+			shadow.adoptedStyleSheets = newStyleSheets;
+		}else
+			shadow.innerHTML += `<style>${IOSApp.css}</style>`;
 	}
 
 	connectedCallback() {
 		if(!this.initialized) this.initialized = true;
 		else return;
 
-		this.loadStyleSheet(() => {
+		IOSApp.loadStyleSheet(() => {
 			this.attachShadow({mode: 'open'});
-			this.addStyleToShadow(this.shadowRoot);
+			IOSApp.addStyleToShadow(this.shadowRoot);
 			this.shadowRoot.innerHTML += `
 				<i-tabbar></i-tabbar>
 				<slot></slot>
