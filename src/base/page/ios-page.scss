@@ -15,9 +15,21 @@ page-shadow {
 		display: block;
 		height: 100%;
 		width: 100%;
-		overflow: auto;
-		overflow-x: scroll;
+		overflow: hidden auto;
 		box-sizing: border-box;
+
+		@supports selector(::-webkit-scrollbar-thumb){
+			&::-webkit-scrollbar {
+				width: 4px;
+			}
+			&::-webkit-scrollbar-thumb {
+				background: var(--i-text-3);
+				border-radius: 99px;
+			}
+			&::-webkit-scrollbar-track {
+				background: transparent;
+			}
+		}
 	}
 
 	page-body {

@@ -80,11 +80,12 @@ class IOSPage extends HTMLElement {
 	_bindTouchGestures(){
 		this.gesture = { started: false, percent: 0, startX: 0, speed: 0, currentX: 0, lastX: 0, width: 0 };
 
-		this.addEventListener("touchstart", (e) => {
-			var touchX = e.touches[0].clientX - this.tab.getBoundingClientRect().left;
-			if(this.prevPage !== undefined && e.touches.length == 1 && touchX < 25){
+		addPointerListener(this, "down", e => {
+			var touchX = e.clientX - this.tab.getBoundingClientRect().left;
+			if(this.prevPage !== undefined && !this.gesture.pointerId && touchX < 25){
 
 				this.gesture.started = true;
+				this.gesture.pointerId = e.pointerId;
 				this.gesture.percent = 0;
 				this.gesture.startX = touchX;
 				this.gesture.width = this.getBoundingClientRect().right - this.getBoundingClientRect().left;
@@ -95,11 +96,11 @@ class IOSPage extends HTMLElement {
 				e.preventDefault();
 			}
 		});
-		this.addEventListener("touchmove", (e) => {
-			if(this.gesture.started && e.touches.length == 1){
+		addPointerListener(this, "move", e => {
+			if(this.gesture.started && this.gesture.pointerId === e.pointerId){
 
 				this.gesture.previousX = this.gesture.currentX;
-				this.gesture.currentX = e.touches[0].clientX - this.tab.getBoundingClientRect().left;
+				this.gesture.currentX = e.clientX - this.tab.getBoundingClientRect().left;
 				this.gesture.speed = this.gesture.currentX - this.gesture.previousX;
 				this.gesture.percent = (this.gesture.currentX - this.gesture.startX) / this.gesture.width;
 
@@ -107,9 +108,10 @@ class IOSPage extends HTMLElement {
 				e.preventDefault();
 			}
 		});
-		this.addEventListener("touchend", (e) => {
-			if(this.gesture.started){
+		addPointerListener(this, "up", e => {
+			if(this.gesture.started && this.gesture.pointerId == e.pointerId){
 				this.gesture.started = false;
+				this.gesture.pointerId = 0;
 				var percent = this.gesture.percent;
 
 				if(percent > 0.5 || this.gesture.speed > 5){
@@ -121,6 +123,16 @@ class IOSPage extends HTMLElement {
 				}
 				else this.app._animateTransition(this, 400, a => (1-percent) + percent * a);
 			}
+		});
+
+		this.addEventListener("pointerdown", e => {
+			
+		});
+		this.addEventListener("pointermove", e => {
+			
+		});
+		this.addEventListener("pointerup", (e) => {
+			
 		});
 	}
 }

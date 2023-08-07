@@ -287,7 +287,7 @@ class IOSTitlebar extends HTMLElement {
   		do {
 		    rect.left += element.offsetLeft;
 		    rect.top += element.offsetTop;
-  		} while(element = element.offsetParent)
+  		} while((element = element.offsetParent) !== this.page.app)
   		rect.right = rect.left + (sizes.right - rect.left);
   		rect.bottom = rect.top + (sizes.bottom - rect.top);
 		return rect;
@@ -359,18 +359,16 @@ class DefaultTitlebar extends IOSTitlebar {
 		this.backgroundElement = this.querySelector("#background");
 
 		this.page.container.addEventListener("scroll", e => this.onPageScroll(this.page.container.scrollTop));
-		this.backContainerElement.addEventListener("touchstart", e => {
+		addPointerListener(this, "down", e => {
 			e.preventDefault();
-			e.stopPropagation();
 			this.backContainerElement.classList.add("pressed");
 		});
-		this.backContainerElement.addEventListener("touchend", e => {
+		addPointerListener(this, "up", e => {
 			e.preventDefault();
-			e.stopPropagation();
 			this.backContainerElement.classList.remove("pressed");
 			this.page.tab.goToPreviousPage();
 		});
-
+		
 		if(this.page.prevPage === undefined){
 			this.backTextElement.style.opacity = 0;
 			this.backArrowElement.style.opacity = 0;
@@ -390,7 +388,7 @@ class DefaultTitlebar extends IOSTitlebar {
 		const titleRect = this._getTextPosition(this.getTitleElement());
 		return {
 			left: appRect.right - (titleRect.right - titleRect.left),
-			top: titleRect.top
+			top: titleRect.top - appRect.top
 		};
 	}
 

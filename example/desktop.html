@@ -1,0 +1,90 @@
+﻿<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+		<meta http-equiv="Content-Language" content="en">
+		<meta charset="UTF-8">
+		<meta name="google" content="notranslate">
+
+		<link rel="icon" type="image/x-icon" href="resources/favicon.ico">
+
+		<script src="../out/web-ios-app.js"></script>
+		<link rel="stylesheet" href="../out/web-ios-app.css" onload="IOSApp.notifyCSS()">
+
+		<title>Web IOS App</title>
+
+		<style>
+			body {
+				background: url("resources/desktop-background.jpg");
+				background-size: cover;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			device-template {
+				display: inline-flex;
+				position: relative;
+			}
+
+			device-template > i-app {
+				width: var(--width);
+				height: var(--height);
+				margin: var(--margin);
+				--i-inset-top: var(--inset-top);
+				--i-inset-bottom: var(--inset-bottom);
+			}
+
+			device-template::after {
+				content: " ";
+				position: absolute;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				
+				pointer-events: none;
+				z-index: 20;
+				background-size: cover;
+				background-image: var(--bezel);
+			}
+
+
+			.iphone14 {
+				--width: 390px;
+				--height: 843px;
+				--margin: 32px;
+				--bezel: url("resources/iphone14.png");
+				--inset-top: 44px;
+				--inset-bottom: 34px;
+			}
+
+		</style>
+	</head>
+
+	<body>
+		<device-template class="iphone14">
+			<i-app>
+				<i-tab selected name="Overview" pagePath="overview">
+					<template path="overview" title="Overview" titlebar="titled" inverted="true">
+						Here you can see all possible UI controls
+						<table-view>
+							<div slot="header">Appearance</div>
+							<table-cell chevron nextPage="pages/colors">Colors</table-cell>
+						</table-view>
+						<table-view>
+							<div slot="header">Page</div>
+							<table-cell chevron nextPage="pages/titlebars">Titlebar</table-cell>
+							<table-cell chevron nextPage="pages/toolbar">Toolbar</table-cell>
+						</table-view>
+						<table-view>
+							<div slot="header">Elements</div>
+							<table-cell chevron nextPage="pages/tableview">Tableview</table-cell>
+							
+						</table-view>
+					</template>
+				</i-tab>
+				<i-tab name="Test" pagePath="pages/test1"></i-tab>
+			</i-app>
+		</device-template>
+	</body>
+</html>
