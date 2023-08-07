@@ -124,16 +124,6 @@ class IOSPage extends HTMLElement {
 				else this.app._animateTransition(this, 400, a => (1-percent) + percent * a);
 			}
 		});
-
-		this.addEventListener("pointerdown", e => {
-			
-		});
-		this.addEventListener("pointermove", e => {
-			
-		});
-		this.addEventListener("pointerup", (e) => {
-			
-		});
 	}
 }
 window.customElements.define('i-page', IOSPage);
