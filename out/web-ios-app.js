@@ -974,9 +974,10 @@ class DefaultTitlebar extends IOSTitlebar {
 
 	getHiddenTitleElementPosition(){
 		const appRect = this.page.app.getBoundingClientRect();
+		const pageRect = this.page.getBoundingClientRect();
 		const titleRect = this._getTextPosition(this.getTitleElement());
 		return {
-			left: appRect.right - (titleRect.right - titleRect.left),
+			left: (appRect.right - appRect.left) - (titleRect.right - titleRect.left),
 			top: titleRect.top - appRect.top
 		};
 	}
@@ -1048,7 +1049,7 @@ class TitledTitlebar extends DefaultTitlebar{
 	}
 
 	onPageScroll(scrollTop) {
-		const pos = this._getTextPosition(this.getTitleElement());
+		const pos = this._relativeToApp(this._getTextPosition(this.titleHeaderElement));
 		const titlebar = this.getBoundingClientRect();
 
 		var titleY = pos.bottom - 7;
