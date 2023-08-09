@@ -2,15 +2,14 @@
 	"tabs": [
 		{
 			"selected": true,
-			"icon": "../src/ios-svg/wrench.svg",
-			"id": "tab_test",
-			"name": "Test",
-			"page": "pages/test"
-		},{
-			"icon": "../src/ios-svg/bars.svg",
-			"id": "tab_main",
-			"name": "Headers",
-			"page": "pages/headers"
+			"name": "Welcome",
+			"id": "welcome",
+			"page": "pages/welcome"
+		},
+		{
+			"name": "Overview",
+			"id": "overview",
+			"page": "pages/overview"
 		}
 	]
 }

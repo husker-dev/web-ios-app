@@ -3,9 +3,7 @@ i-app-detection-label {
   --a: 0;
 }
 
-i-app * {
-  margin: 0px;
-  padding: 0px;
+.i-root * {
   -webkit-touch-callout: none;
   -webkit-user-callout: none;
   -webkit-user-select: none;
@@ -27,16 +25,19 @@ i-app {
   --i-inset-right: 0px;
   --i-inset-bottom: 0px;
   --i-inset-left: 0px;
-  /* UI size */
+  /* Some default UI sizes */
   --i-top-menu-height: 44px;
   --i-bottom-menu-height: 50px;
   /* Defaults */
   --i-font: -apple-system, BlinkMacSystemFont, sans-serif;
   --i-accent: var(--i-blue);
   --i-accent-active: var(--i-green);
-  --i-statusbar: linear-gradient(0deg, transparent 0%, rgb(100, 100, 100) 100%);
-  --i-separator-menu: rgba(0, 0, 0, 0.30);
-  /* New color constants */
+}
+
+.i-theme-light {
+  /* 
+  *	Light theme color constants 
+  */
   --i-red: rgb(255, 59, 48);
   --i-orange: rgb(255, 149, 0);
   --i-yellow: rgb(255, 204, 0);
@@ -71,105 +72,108 @@ i-app {
   --i-fill-4: rgba(116, 116, 128, 0.08);
   --i-separator: rgba(60, 60, 67, 0.36);
   --i-separator-opaque: rgb(198, 198, 200);
+  --i-separator-menu: rgba(0, 0, 0, 0.30);
+  --i-statusbar-fill: linear-gradient(0deg, transparent 0%, rgb(100, 100, 100) 100%);
 }
-
-.i-material-thick {
+.i-theme-light.inverted {
+  --i-bg-1: rgb(242, 242, 247);
+  --i-bg-2: rgb(255, 255, 255);
+  --i-bg-3: rgb(242, 242, 247);
+  --i-bg-4: rgb(230, 229, 235);
+}
+.i-theme-light.i-material-thick, .i-theme-light .i-material-thick {
   background: rgba(242, 242, 242, 0.95);
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
 }
-
-.i-material-regular {
+.i-theme-light.i-material-regular, .i-theme-light .i-material-regular {
   background: rgba(245, 245, 245, 0.77);
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
 }
-
-.i-material-thin {
+.i-theme-light.i-material-thin, .i-theme-light .i-material-thin {
   background: rgba(244, 244, 244, 0.59);
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
 }
-
-.i-material-ultrathin {
+.i-theme-light.i-material-ultrathin, .i-theme-light .i-material-ultrathin {
   background: rgba(217, 217, 217, 0.41);
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
 }
-
-.i-material-chrome {
+.i-theme-light.i-material-chrome, .i-theme-light .i-material-chrome {
   background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
 }
 
-@media (prefers-color-scheme: dark) {
-  i-app {
-    /* Defaults */
-    --i-statusbar: transparent;
-    --i-separator-menu: rgba(255, 255, 255, 0.15);
-    /* New color constants */
-    --i-red: rgb(255, 69, 58);
-    --i-orange: rgb(255, 159, 10);
-    --i-yellow: rgb(255, 214, 110);
-    --i-green: rgb(48, 209, 88);
-    --i-mint: rgb(99, 230, 226);
-    --i-teal: rgb(64, 203, 224);
-    --i-cyan: rgb(100, 210, 255);
-    --i-blue: rgb(10, 132, 255);
-    --i-indigo: rgb(94, 92, 230);
-    --i-purple: rgb(191, 90, 242);
-    --i-pink: rgb(255, 55, 95);
-    --i-brown: rgb(172, 142, 104);
-    --i-black: rgb(0, 0, 0);
-    --i-grey: rgb(142, 142, 147);
-    --i-grey-2: rgb(99, 99, 102);
-    --i-grey-3: rgb(72, 72, 74);
-    --i-grey-4: rgb(58, 58, 60);
-    --i-grey-5: rgb(44, 44, 46);
-    --i-grey-6: rgb(28, 28, 30);
-    --i-white: rgb(255, 255, 255);
-    --i-bg-1: rgb(0, 0, 0);
-    --i-bg-2: rgb(28, 28, 30);
-    --i-bg-3: rgb(44, 44, 46);
-    --i-bg-4: rgb(58, 58, 60);
-    --i-text-1: rgb(255, 255, 255);
-    --i-text-2: rgba(235, 235, 245, 0.6);
-    --i-text-3: rgba(235, 235, 245, 0.3);
-    --i-text-4: rgba(235, 235, 245, 0.16);
-    --i-fill-1: rgba(120, 120, 128, 0.36);
-    --i-fill-2: rgba(120, 120, 128, 0.32);
-    --i-fill-3: rgba(118, 118, 128, 0.24);
-    --i-fill-4: rgba(116, 116, 128, 0.18);
-    --i-separator: rgba(84, 84, 88, 0.65);
-    --i-separator-opaque: rgb(56, 56, 58);
-  }
-  .i-material-thick {
-    background: rgba(36, 36, 36, 0.91);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
-  }
-  .i-material-regular {
-    background: rgba(40, 40, 40, 0.8);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
-  }
-  .i-material-thin {
-    background: rgba(51, 51, 51, 0.64);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
-  }
-  .i-material-ultrathin {
-    background: rgba(50, 50, 50, 0.43);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
-  }
-  .i-material-chrome {
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
-  }
+.i-theme-dark {
+  /* 
+  *	Dark theme color constants 
+  */
+  --i-red: rgb(255, 69, 58);
+  --i-orange: rgb(255, 159, 10);
+  --i-yellow: rgb(255, 214, 110);
+  --i-green: rgb(48, 209, 88);
+  --i-mint: rgb(99, 230, 226);
+  --i-teal: rgb(64, 203, 224);
+  --i-cyan: rgb(100, 210, 255);
+  --i-blue: rgb(10, 132, 255);
+  --i-indigo: rgb(94, 92, 230);
+  --i-purple: rgb(191, 90, 242);
+  --i-pink: rgb(255, 55, 95);
+  --i-brown: rgb(172, 142, 104);
+  --i-black: rgb(0, 0, 0);
+  --i-grey: rgb(142, 142, 147);
+  --i-grey-2: rgb(99, 99, 102);
+  --i-grey-3: rgb(72, 72, 74);
+  --i-grey-4: rgb(58, 58, 60);
+  --i-grey-5: rgb(44, 44, 46);
+  --i-grey-6: rgb(28, 28, 30);
+  --i-white: rgb(255, 255, 255);
+  --i-bg-1: rgb(0, 0, 0);
+  --i-bg-2: rgb(28, 28, 30);
+  --i-bg-3: rgb(44, 44, 46);
+  --i-bg-4: rgb(58, 58, 60);
+  --i-text-1: rgb(255, 255, 255);
+  --i-text-2: rgba(235, 235, 245, 0.6);
+  --i-text-3: rgba(235, 235, 245, 0.3);
+  --i-text-4: rgba(235, 235, 245, 0.16);
+  --i-fill-1: rgba(120, 120, 128, 0.36);
+  --i-fill-2: rgba(120, 120, 128, 0.32);
+  --i-fill-3: rgba(118, 118, 128, 0.24);
+  --i-fill-4: rgba(116, 116, 128, 0.18);
+  --i-separator: rgba(84, 84, 88, 0.65);
+  --i-separator-opaque: rgb(56, 56, 58);
+  --i-separator-menu: rgba(255, 255, 255, 0.15);
+  --i-statusbar-fill: transparent;
 }
+.i-theme-dark.i-material-thick, .i-theme-dark .i-material-thick {
+  background: rgba(36, 36, 36, 0.91);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+}
+.i-theme-dark.i-material-regular, .i-theme-dark .i-material-regular {
+  background: rgba(40, 40, 40, 0.8);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+}
+.i-theme-dark.i-material-thin, .i-theme-dark .i-material-thin {
+  background: rgba(51, 51, 51, 0.64);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+}
+.i-theme-dark.i-material-ultrathin, .i-theme-dark .i-material-ultrathin {
+  background: rgba(50, 50, 50, 0.43);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+}
+.i-theme-dark.i-material-chrome, .i-theme-dark .i-material-chrome {
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+}
+
 html:has(i-app[standalone]) {
   margin: 0px;
   padding: 0px;
@@ -231,22 +235,26 @@ page-shadow page-body {
   display: block;
 }
 
+/*
 @media (prefers-color-scheme: light) {
-  i-page.inverted {
-    --i-bg-1: rgb(242, 242, 247);
-    --i-bg-2: rgb(255, 255, 255);
-    --i-bg-3: rgb(242, 242, 247);
-    --i-bg-4: rgb(230, 229, 235);
-  }
+	i-page.inverted {
+		--i-bg-1: rgb(242, 242, 247);
+		--i-bg-2: rgb(255, 255, 255);
+		--i-bg-3: rgb(242, 242, 247);
+		--i-bg-4: rgb(230, 229, 235);
+	}
 }
+
 @media (prefers-color-scheme: dark) {
-  i-page.inverted {
-    --i-bg-1: rgb(0, 0, 0);
-    --i-bg-2: rgb(28, 28, 30);
-    --i-bg-3: rgb(44, 44, 46);
-    --i-bg-4: rgb(58, 58, 60);
-  }
-}i-tab {
+	i-page.inverted {
+		--i-bg-1: rgb(0, 0, 0);
+		--i-bg-2: rgb(28, 28, 30);
+		--i-bg-3: rgb(44, 44, 46);
+		--i-bg-4: rgb(58, 58, 60);
+	}
+}
+
+*/i-tab {
 	height: 100%;
 	width: 100%;
 	display: none;
@@ -373,7 +381,7 @@ page-shadow:has(> .titlebar-default) .titlebar-default #content-container {
 }
 page-shadow:has(> .titlebar-default) .titlebar-default #content-container #statusbar {
   height: var(--i-inset-top);
-  background: var(--i-statusbar);
+  background: var(--i-statusbar-fill);
 }
 page-shadow:has(> .titlebar-default) .titlebar-default #content-container #controls-container {
   display: flex;

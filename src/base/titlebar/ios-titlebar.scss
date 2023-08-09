@@ -84,7 +84,7 @@ page-shadow:has(> .titlebar-default) {
 
 			#statusbar {
 				height: var(--i-inset-top);
-				background: var(--i-statusbar);
+				background: var(--i-statusbar-fill);
 			}
 
 			#controls-container {

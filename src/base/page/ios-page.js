@@ -34,7 +34,7 @@ class IOSPage extends HTMLElement {
 		mirrorEvents(this, tab, [
 			"page-created", "page-selected", "page-deselected",
 		]);
-
+		this.app._bindThemeChangingElement(this);
 		this.titlebar._bindPage(this);
 		this._bindTouchGestures();
 		this.dispatchEvent(new CustomEvent("page-created", { detail: { page: this } }));
@@ -44,7 +44,7 @@ class IOSPage extends HTMLElement {
 			this._executePageScripts();
 
 		// Workaround to fix mispositioned scroll bar on opened pages
-		setTimeout(() => {this.style.overflow = "hidden"}, 100);
+		setTimeout(() => {this.style.overflow = "hidden"}, 500);
 	}
 
 	selected(){

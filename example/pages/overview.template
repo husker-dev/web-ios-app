@@ -1,0 +1,5 @@
+<template
+	title="Overview"
+	titlebar="titled"
+	inverted="true"
+></template>

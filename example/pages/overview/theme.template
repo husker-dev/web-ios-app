@@ -1,0 +1,5 @@
+<template
+	title="Theme"
+	titlebar="titled"
+	inverted="true"
+></template>

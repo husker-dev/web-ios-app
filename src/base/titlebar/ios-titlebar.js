@@ -106,6 +106,7 @@ class IOSTitlebarRoot extends HTMLElement {
 		this.backArrow = this.querySelector("#anim-back-arrow");
 		this.tools = this.querySelector("#anim-tools");
 
+		this.tab.app._bindThemeChangingElement(this);
 		this.tab.app.addEventListener("transition-started", e => {
 			if(!this.tab.hasAttribute("selected"))
 				return;
@@ -268,6 +269,7 @@ class IOSTitlebar extends HTMLElement {
 	_bindPage(page){
 		this.page = page;
 		this.classList.add("titlebar");
+		this.page.app._bindThemeChangingElement(this);
 
 		this.backArrowOpacityFunc = (p) => p;
 	}
@@ -424,7 +426,7 @@ class DefaultTitlebar extends IOSTitlebar {
 	}
 
 	getToolsElementPosition(){
-		return this._relativeToApp(this._getElementRect(this.getToolsElement()));
+		return this._getElementRect(this.getToolsElement());
 	}
 
 	onPageScroll(scrollTop) {}

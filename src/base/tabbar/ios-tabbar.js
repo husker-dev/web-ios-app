@@ -4,12 +4,14 @@ class IOSTabbar extends HTMLElement {
 
 	connectedCallback(){
 		this.classList.add("i-material-chrome");
+		this.classList.add("i-root");
 	}
 
 	bindApp(app){
 		var that = this;
 		this.app = app;
 
+		app._bindThemeChangingElement(this);
 		app.addEventListener("tab-created", e => {
 			var item = document.createElement("i-tabbar-item");
 			item.id = `tabbar_${e.detail.tab.id}`;

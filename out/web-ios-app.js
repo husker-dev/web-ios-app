@@ -7,6 +7,14 @@ function openPage(element, page){
 		element.showNewPage(page);
 }
 
+function openTab(element, tabId){
+	while(element != window.body && !(element instanceof IOSApp))
+		element = element.parentElement;
+	
+	if(element instanceof IOSApp)
+		element.selectTab(tabId);
+}
+
 function loadSVG(src, callback){
 	if(src.trim().startsWith("<svg"))
 		return callback(src);
@@ -55,8 +63,29 @@ function addPointerListener(element, type, callback){
 	});
 }
 
+class IOSElement extends HTMLElement {
+
+	_watchChildren(callback){
+		new MutationObserver(e => e.forEach(r => r.addedNodes.forEach(callback)))
+			.observe(this, {childList: true});
+		[...this.children].forEach(callback);
+	}
+
+	_watchAttribute(callback, attributeName, defaultValue = undefined){
+		let oldValue = this.hasAttribute(attributeName) ? this.getAttribute(attributeName) : defaultValue;
+		callback(oldValue);
+		new MutationObserver(e => {
+			let newValue = this.hasAttribute(attributeName) ? this.getAttribute(attributeName) : defaultValue;
+			if(newValue !== oldValue)
+				callback(newValue);
+			oldValue = newValue
+		}).observe(this, {attributes: true, attributeFilter: [attributeName]});
+	}
+}
+
 /*
 	Events:
+		- theme-changed
 		- transition-started
 		- transition-completed
 		- transition
@@ -67,7 +96,7 @@ function addPointerListener(element, type, callback){
 		- page-selected
 		- page-deselected
 */
-class IOSApp extends HTMLElement {
+class IOSApp extends IOSElement {
 
 	static _cssCallbacks = [];
 	static notifyCSS(){
@@ -94,7 +123,7 @@ class IOSApp extends HTMLElement {
 		if(document.adoptedStyleSheets){
 			const newStyleSheets = [IOSApp.css];
 			for (let i = 0; i < shadow.adoptedStyleSheets.length; i++)
-			    newStyleSheets.push(shadow.adoptedStyleSheets[i]);
+				newStyleSheets.push(shadow.adoptedStyleSheets[i]);
 			shadow.adoptedStyleSheets = newStyleSheets;
 		}else
 			shadow.innerHTML += `<style>${IOSApp.css}</style>`;
@@ -105,35 +134,65 @@ class IOSApp extends HTMLElement {
 		else return;
 
 		IOSApp.loadStyleSheet(() => {
+			this.classList.add("i-root");
+
+			// Color scheme changing
+			this._colorChangingElements = [];
+			this._bindThemeChangingElement(this);
+			["dark", "light"].forEach(theme => 
+				window.matchMedia(`(prefers-color-scheme: ${theme})`).addEventListener("change", e => {
+					if(e.matches && (this.getAttribute("theme") || "auto") == "auto"){
+						this._theme = `i-theme-${theme}`;
+						this._recalcTheme();
+					}
+				})
+			);
+			this._watchAttribute(value => {
+				if(value == "auto")
+					this._theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? "i-theme-dark" : "i-theme-light";
+				else this._theme = `i-theme-${value}`;
+				this._recalcTheme();
+			}, "theme", "auto");
+
+			// Attaching shadow with tabbar
 			this.attachShadow({mode: 'open'});
 			IOSApp.addStyleToShadow(this.shadowRoot);
 			this.shadowRoot.innerHTML += `
 				<i-tabbar></i-tabbar>
 				<slot></slot>
 			`;
-
 			this.bottomMenu = this.shadowRoot.querySelector("i-tabbar");
 			this.bottomMenu.bindApp(this);
 
+			// Risize listener to check if in IPad mode
 			new ResizeObserver(e => {
 				const rect = this.getBoundingClientRect();
 				this.classList.toggle("large-screen", e[0].contentRect.width >= 600)
 			}).observe(this);
 
-			new MutationObserver(e => e.forEach(r => r.addedNodes.forEach(element => {
-				if(element instanceof IOSTab){
+			// Children listener to proper add tabs
+			this._watchChildren(element => {
+				if(element instanceof IOSTab)
 					this._processBindTab(element);
-				}
-			}))).observe(this, {childList: true});
-
-			[...this.children].forEach(e => {
-				if(e instanceof IOSTab)
-					this._processBindTab(e);
-			});
+			}, true);
 
 			if(this.hasAttribute("manifest"))
 				this._loadFromManifest();
 		});
+	}
+
+	_recalcTheme(){
+		this._colorChangingElements.forEach(element => {
+			[...element.classList]
+				.filter(c => c.startsWith("i-theme"))
+				.forEach(c => element.classList.remove(c));
+			element.classList.add(this._theme);
+		});
+	}
+
+	_bindThemeChangingElement(element){
+		this._colorChangingElements.push(element);
+		this._recalcTheme();
 	}
 
 	_processBindTab(tab){
@@ -148,10 +207,10 @@ class IOSApp extends HTMLElement {
 			appManifest.tabs.forEach(tabManifest => {
 				var tab = document.createElement("i-tab");
 				if(tabManifest.selected) tab.setAttribute("selected", "");
-				if(tabManifest.id) tab.id = tabManifest.id;
-				if(tabManifest.name) tab.name = tabManifest.name;
-				if(tabManifest.page) tab.page = tabManifest.page;
-				if(tabManifest.icon) tab.icon = tabManifest.icon;
+				if(tabManifest.id) tab.setAttribute("id", tabManifest.id);
+				if(tabManifest.name) tab.setAttribute("name", tabManifest.name);
+				if(tabManifest.page) tab.setAttribute("page", tabManifest.page);
+				if(tabManifest.icon) tab.setAttribute("icon", tabManifest.icon);
 				this.appendChild(tab);
 			});
 		});
@@ -168,19 +227,19 @@ class IOSApp extends HTMLElement {
 	_animateTransition(page, duration, transform = percent => percent) {
 		let animationId = new IOSAnimationId();
 		var easing = bezier(0.2, 0.8, 0.2, 1);
-  		var start = Date.now();
-  		var that = this;
-  		this._transitionStarted(animationId, page);
-  		(function loop () {
-    		var p = (Date.now()-start)/duration;
-    		if (p >= 1){
-      			that._processTransitionFrame(page, transform(1));
-    			that._transitionCompleted(animationId, page, transform(1) == 1);
-    		}else {
-      			that._processTransitionFrame(animationId, page, transform(easing(p)));
-      			requestAnimationFrame(loop);
-    		}
-  		}());
+		var start = Date.now();
+		var that = this;
+		this._transitionStarted(animationId, page);
+		(function loop () {
+			var p = (Date.now()-start)/duration;
+			if (p >= 1){
+				that._processTransitionFrame(page, transform(1));
+				that._transitionCompleted(animationId, page, transform(1) == 1);
+			}else {
+				that._processTransitionFrame(animationId, page, transform(easing(p)));
+				requestAnimationFrame(loop);
+			}
+		}());
 	}
 
 	_transitionStarted(animationId, page){
@@ -349,7 +408,7 @@ class IOSPage extends HTMLElement {
 		mirrorEvents(this, tab, [
 			"page-created", "page-selected", "page-deselected",
 		]);
-
+		this.app._bindThemeChangingElement(this);
 		this.titlebar._bindPage(this);
 		this._bindTouchGestures();
 		this.dispatchEvent(new CustomEvent("page-created", { detail: { page: this } }));
@@ -359,7 +418,7 @@ class IOSPage extends HTMLElement {
 			this._executePageScripts();
 
 		// Workaround to fix mispositioned scroll bar on opened pages
-		setTimeout(() => {this.style.overflow = "hidden"}, 100);
+		setTimeout(() => {this.style.overflow = "hidden"}, 500);
 	}
 
 	selected(){
@@ -482,8 +541,8 @@ class IOSTab extends HTMLElement {
 
 		this.dispatchEvent(new CustomEvent("tab-created", { detail: { tab: this } }));
 
-		if(this.getAttribute("pagePath"))
-			this.showNewPage(this.getAttribute("pagePath"));
+		if(this.getAttribute("page"))
+			this.showNewPage(this.getAttribute("page"));
 	}
 
 	showNewPage(src){
@@ -548,12 +607,14 @@ class IOSTabbar extends HTMLElement {
 
 	connectedCallback(){
 		this.classList.add("i-material-chrome");
+		this.classList.add("i-root");
 	}
 
 	bindApp(app){
 		var that = this;
 		this.app = app;
 
+		app._bindThemeChangingElement(this);
 		app.addEventListener("tab-created", e => {
 			var item = document.createElement("i-tabbar-item");
 			item.id = `tabbar_${e.detail.tab.id}`;
@@ -695,6 +756,7 @@ class IOSTitlebarRoot extends HTMLElement {
 		this.backArrow = this.querySelector("#anim-back-arrow");
 		this.tools = this.querySelector("#anim-tools");
 
+		this.tab.app._bindThemeChangingElement(this);
 		this.tab.app.addEventListener("transition-started", e => {
 			if(!this.tab.hasAttribute("selected"))
 				return;
@@ -857,6 +919,7 @@ class IOSTitlebar extends HTMLElement {
 	_bindPage(page){
 		this.page = page;
 		this.classList.add("titlebar");
+		this.page.app._bindThemeChangingElement(this);
 
 		this.backArrowOpacityFunc = (p) => p;
 	}
@@ -1013,7 +1076,7 @@ class DefaultTitlebar extends IOSTitlebar {
 	}
 
 	getToolsElementPosition(){
-		return this._relativeToApp(this._getElementRect(this.getToolsElement()));
+		return this._getElementRect(this.getToolsElement());
 	}
 
 	onPageScroll(scrollTop) {}
@@ -1308,7 +1371,7 @@ class TableView extends HTMLElement {
 	}
 }
 
-class TableCell extends HTMLElement {
+class TableCell extends IOSElement {
 
 	connectedCallback() {
 		this.attachShadow({mode: 'open'});
@@ -1429,8 +1492,10 @@ class RadioCellDecorator {
 
 		cell.groupName = cell.getAttribute("group");
 		cell.shadowItem = cell.shadowRoot.querySelector("#item");
-		if(cell.hasAttribute("selected"))
-			cell.select();
+		cell._watchAttribute(value => {
+			if(value === '') cell.select();
+		}, "selected");
+			
 		cell.addEventListener("click", e => {
 			cell.select();
 		});

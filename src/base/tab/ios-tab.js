@@ -38,8 +38,8 @@ class IOSTab extends HTMLElement {
 
 		this.dispatchEvent(new CustomEvent("tab-created", { detail: { tab: this } }));
 
-		if(this.getAttribute("pagePath"))
-			this.showNewPage(this.getAttribute("pagePath"));
+		if(this.getAttribute("page"))
+			this.showNewPage(this.getAttribute("page"));
 	}
 
 	showNewPage(src){

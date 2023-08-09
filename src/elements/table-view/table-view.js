@@ -57,7 +57,7 @@ class TableView extends HTMLElement {
 	}
 }
 
-class TableCell extends HTMLElement {
+class TableCell extends IOSElement {
 
 	connectedCallback() {
 		this.attachShadow({mode: 'open'});
@@ -178,8 +178,10 @@ class RadioCellDecorator {
 
 		cell.groupName = cell.getAttribute("group");
 		cell.shadowItem = cell.shadowRoot.querySelector("#item");
-		if(cell.hasAttribute("selected"))
-			cell.select();
+		cell._watchAttribute(value => {
+			if(value === '') cell.select();
+		}, "selected");
+			
 		cell.addEventListener("click", e => {
 			cell.select();
 		});

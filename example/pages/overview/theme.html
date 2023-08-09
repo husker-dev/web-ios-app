@@ -1,0 +1,63 @@
+<script>
+	var app = document.querySelector("i-app");
+
+	[...document.querySelectorAll("i-app table-cell[group='theme']")].forEach(el => {
+		if(el.getAttribute("themeValue") == app.getAttribute("theme") || 
+			el.getAttribute("themeValue") === "auto" && !app.hasAttribute("theme"))
+			el.setAttribute("selected", "");
+
+		el.addEventListener("change", e => app.setAttribute("theme", el.getAttribute("themeValue")));
+	});
+</script>
+
+<style>
+	.theme {
+		position: relative;
+		border-radius: 100px;
+		width: 18px;
+		height: 18px;
+		
+	}
+
+	.theme::after {
+		content: " ";
+		display: flex;
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 18px;
+		height: 18px;
+		border-radius: 100px;
+		border: solid 1.5px rgb(255 255 255 / 24%);
+		box-sizing: border-box;
+		mix-blend-mode: difference;
+	}
+
+	.theme-mixed {
+		background-image: linear-gradient(90deg, white 0%, white 50%, black 50%, black 100%);
+	}
+
+	.theme-dark {
+		background-color: black;
+	}
+
+	.theme-light {
+		background-color: white;
+	}
+</style>
+
+The toolbar is the element with button at the top of the application. It depends on the page setup.
+<table-view>
+	<table-cell radio group="theme" themeValue="auto">
+		<div slot="icon" class="theme theme-mixed"></div>
+		Auto
+	</table-cell>
+	<table-cell radio group="theme" themeValue="dark">
+		<div slot="icon" class="theme theme-dark"></div>
+		Dark
+	</table-cell>
+	<table-cell radio group="theme" themeValue="light">
+		<div slot="icon" class="theme theme-light"></div>
+		Light
+	</table-cell>
+</table-view>

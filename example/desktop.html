@@ -49,7 +49,6 @@
 				background-image: var(--bezel);
 			}
 
-
 			.iphone14 {
 				--width: 390px;
 				--height: 843px;
@@ -58,34 +57,12 @@
 				--inset-top: 44px;
 				--inset-bottom: 34px;
 			}
-
 		</style>
 	</head>
 
 	<body>
 		<device-template class="iphone14">
-			<i-app>
-				<i-tab selected name="Overview" pagePath="overview">
-					<template path="overview" title="Overview" titlebar="titled" inverted="true">
-						Here you can see all possible UI controls
-						<table-view>
-							<div slot="header">Appearance</div>
-							<table-cell chevron nextPage="pages/colors">Colors</table-cell>
-						</table-view>
-						<table-view>
-							<div slot="header">Page</div>
-							<table-cell chevron nextPage="pages/titlebars">Titlebar</table-cell>
-							<table-cell chevron nextPage="pages/toolbar">Toolbar</table-cell>
-						</table-view>
-						<table-view>
-							<div slot="header">Elements</div>
-							<table-cell chevron nextPage="pages/tableview">Tableview</table-cell>
-							
-						</table-view>
-					</template>
-				</i-tab>
-				<i-tab name="Test" pagePath="pages/test1"></i-tab>
-			</i-app>
+			<i-app manifest="app.appmanifest"></i-app>
 		</device-template>
 	</body>
 </html>
