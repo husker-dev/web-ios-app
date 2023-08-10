@@ -3,7 +3,7 @@
  PWA framework for simulation native IOS application.
 
  ## Desktop example:
- https://husker-dev.github.io/web-ios-app/example/desktop.html
+ https://husker-dev.github.io/web-ios-app/example/desktop
 
  ## PWA example:
  https://husker-dev.github.io/web-ios-app/example/
