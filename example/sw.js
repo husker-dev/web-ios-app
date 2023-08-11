@@ -3,6 +3,7 @@ const contentToCache = [
 	".",
 	"../out/web-ios-app.js",
 	"../out/web-ios-app.css",
+	"app.appmanifest",
 
 	"pages/blank/blank.html",
 	"pages/blank/blank.template",
